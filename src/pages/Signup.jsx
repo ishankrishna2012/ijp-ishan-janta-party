@@ -10,7 +10,10 @@ export default function Signup() {
   const [codename, setCodename] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [sector, setSector] = useState('');
+  const [section, setSection] = useState('');
+  const [dNo, setDNo] = useState('');
+  const [idCardFile, setIdCardFile] = useState(null);
+  const [idCardPreview, setIdCardPreview] = useState(null);
   const [terms, setTerms] = useState(false);
 
   // States
@@ -22,6 +25,9 @@ export default function Signup() {
   const [scanState, setScanState] = useState('IDLE'); // IDLE, SCANNING, SUCCESS
   const [scanProgress, setScanProgress] = useState(0);
 
+  // Generated ID preview
+  const [previewId, setPreviewId] = useState('IJP-2026-?????');
+
   // If already logged in, redirect appropriately
   useEffect(() => {
     if (user) {
@@ -29,6 +35,46 @@ export default function Signup() {
       else navigate('/student-hub');
     }
   }, [user, navigate]);
+
+  // Update preview ID when D-Number changes
+  useEffect(() => {
+    if (dNo.trim()) {
+      const digitsOnly = dNo.replace(/\D/g, '');
+      if (digitsOnly.length > 0) {
+        const last5 = digitsOnly.slice(-5).padStart(5, '0');
+        const currentYear = new Date().getFullYear();
+        setPreviewId(`IJP-${currentYear}-${last5}`);
+      } else {
+        setPreviewId('IJP-2026-?????');
+      }
+    } else {
+      setPreviewId('IJP-2026-?????');
+    }
+  }, [dNo]);
+
+  // Handle ID card file selection
+  const handleIdCardChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      if (!['image/jpeg', 'image/png', 'image/jpg'].includes(file.type)) {
+        setErrorMsg('Only JPEG and PNG images are accepted for identity documents.');
+        return;
+      }
+      // Validate file size (5MB max)
+      if (file.size > 5 * 1024 * 1024) {
+        setErrorMsg('Identity document must be under 5MB.');
+        return;
+      }
+      setIdCardFile(file);
+      setErrorMsg(null);
+      
+      // Create preview
+      const reader = new FileReader();
+      reader.onloadend = () => setIdCardPreview(reader.result);
+      reader.readAsDataURL(file);
+    }
+  };
 
   // Biometrics Mock Scan Handler
   const handleBiometricScan = () => {
@@ -51,8 +97,8 @@ export default function Signup() {
 
   const handleSignup = async (e) => {
     e.preventDefault();
-    if (!codename || !email || !password || !sector) {
-      setErrorMsg('Please complete all dossiers fields.');
+    if (!codename || !email || !password || !section || !dNo) {
+      setErrorMsg('Please complete all dossier fields including Section and D-Number.');
       return;
     }
     if (scanState !== 'SUCCESS') {
@@ -67,7 +113,7 @@ export default function Signup() {
     setIsSubmitting(true);
     setErrorMsg(null);
 
-    const result = await signUpOperative({ codename, email, password, sector });
+    const result = await signUpOperative({ codename, email, password, section, dNo, idCardFile });
 
     if (result.success) {
       setSuccessId(result.uniqueId);
@@ -131,6 +177,17 @@ export default function Signup() {
                     </div>
                   </div>
                   
+                  <div className="mt-4 flex gap-4 text-xs font-mono-style uppercase">
+                    <div>
+                      <div className="text-[10px] text-tertiary">SECTION</div>
+                      <div className="font-label-bold text-on-surface">DIVISION {section}</div>
+                    </div>
+                    <div>
+                      <div className="text-[10px] text-tertiary">D-NUMBER</div>
+                      <div className="font-label-bold text-on-surface">{dNo}</div>
+                    </div>
+                  </div>
+
                   <div className="mt-6 border-t-2 border-on-surface border-dashed pt-4">
                     <div className="font-mono-style text-[10px] text-tertiary">UNIQUE ID (REQUIRED FOR LOGIN)</div>
                     <div className="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary tracking-widest mt-1 flex items-center justify-between">
@@ -147,7 +204,7 @@ export default function Signup() {
                 </div>
 
                 <p className="font-mono-style text-[11px] text-on-surface-variant mt-6 uppercase animate-pulse">
-                  * Note down your 12-digit Unique ID. You will need it to Uplink.
+                  * Note down your Unique ID. You will need it to Uplink.
                 </p>
               </div>
 
@@ -236,24 +293,30 @@ export default function Signup() {
                     />
                   </div>
 
-                  {/* Sector Selection */}
+                  {/* Section Selection (replaces old Sector) */}
                   <div className="flex flex-col">
-                    <label className="font-label-bold text-label-bold uppercase mb-2 text-on-surface" htmlFor="sector">SECTOR ALLOCATION (GRADE)</label>
+                    <label className="font-label-bold text-label-bold uppercase mb-2 text-on-surface" htmlFor="section">DIVISION ASSIGNMENT (SECTION)</label>
                     <div className="relative">
                       <select 
                         className="border-2 border-on-surface bg-surface-container-lowest w-full p-3 font-body-md text-body-md appearance-none focus:outline-none focus:border-secondary" 
-                        id="sector" 
-                        name="sector"
-                        value={sector}
-                        onChange={(e) => setSector(e.target.value)}
+                        id="section" 
+                        name="section"
+                        value={section}
+                        onChange={(e) => setSection(e.target.value)}
                         required
                         disabled={isSubmitting}
                       >
                         <option value="" disabled>AWAITING ASSIGNMENT...</option>
-                        <option value="g9">Sector 9 (Initiate)</option>
-                        <option value="g10">Sector 10 (Standard)</option>
-                        <option value="g11">Sector 11 (Advanced)</option>
-                        <option value="g12">Sector 12 (Vanguard)</option>
+                        <option value="A">Division A</option>
+                        <option value="B">Division B</option>
+                        <option value="C">Division C</option>
+                        <option value="D">Division D</option>
+                        <option value="E">Division E</option>
+                        <option value="F">Division F</option>
+                        <option value="G">Division G</option>
+                        <option value="H">Division H</option>
+                        <option value="I">Division I</option>
+                        <option value="J">Division J</option>
                       </select>
                       <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-on-surface">
                         <span className="material-symbols-outlined">arrow_drop_down</span>
@@ -262,7 +325,88 @@ export default function Signup() {
                   </div>
                 </div>
 
-                {/* Biometric Scan Section (Fully functional micro-interaction) */}
+                {/* D-Number Field */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="flex flex-col">
+                    <label className="font-label-bold text-label-bold uppercase mb-2 text-on-surface" htmlFor="dno">D-NUMBER</label>
+                    <input 
+                      className="border-2 border-on-surface bg-surface-container-lowest p-3 font-mono-style text-body-md focus:outline-none focus:border-secondary focus:ring-0 transition-colors" 
+                      id="dno" 
+                      name="dno" 
+                      placeholder="e.g. 48291" 
+                      required 
+                      type="text"
+                      value={dNo}
+                      onChange={(e) => setDNo(e.target.value)}
+                      disabled={isSubmitting}
+                    />
+                    <p className="font-mono-style text-on-surface-variant mt-2 text-[10px]">Your D-Number as issued. Last 5 digits become your Operative ID.</p>
+                  </div>
+
+                  {/* Live ID Preview */}
+                  <div className="flex flex-col justify-center">
+                    <div className="font-mono-style text-[10px] text-tertiary uppercase mb-1">GENERATED OPERATIVE ID</div>
+                    <div className="border-2 border-on-surface bg-surface p-3 font-headline-lg-mobile text-headline-lg-mobile text-primary tracking-widest text-center bureaucratic-shadow">
+                      {previewId}
+                    </div>
+                    <p className="font-mono-style text-on-surface-variant mt-2 text-[10px]">This will be your login identifier.</p>
+                  </div>
+                </div>
+
+                {/* ID Card Upload */}
+                <div className="border-2 border-on-surface p-6 bg-surface relative overflow-hidden">
+                  <div className="absolute inset-0 opacity-5 bg-[repeating-linear-gradient(45deg,#1a1c1c_25%,transparent_25%,transparent_75%,#1a1c1c_75%,#1a1c1c),repeating-linear-gradient(45deg,#1a1c1c_25%,#f9f9f9_25%,#f9f9f9_75%,#1a1c1c_75%,#1a1c1c)] bg-[position:0_0,10px_10px] bg-[size:20px_20px]"></div>
+                  <div className="relative z-10">
+                    <h3 className="font-label-bold text-label-bold uppercase text-on-surface mb-1 flex items-center gap-2">
+                      <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>badge</span>
+                      IDENTITY DOCUMENT UPLOAD
+                    </h3>
+                    <p className="font-mono-style text-mono-style text-on-surface-variant text-[11px] mb-4">
+                      Submit student ID card for verification. JPEG/PNG only, max 5MB. Optional but recommended.
+                    </p>
+                    
+                    <div className="flex flex-col sm:flex-row items-start gap-4">
+                      <label 
+                        htmlFor="idcard" 
+                        className={`cursor-pointer font-label-bold text-label-bold uppercase px-6 py-3 border-2 border-on-surface bureaucratic-shadow-hover transition-all flex items-center gap-2 whitespace-nowrap ${
+                          idCardFile 
+                            ? 'bg-secondary-container text-on-secondary-container border-secondary' 
+                            : 'bg-on-surface text-surface-container-lowest'
+                        }`}
+                      >
+                        <span className="material-symbols-outlined">
+                          {idCardFile ? 'check_circle' : 'upload_file'}
+                        </span>
+                        {idCardFile ? 'DOCUMENT ATTACHED' : 'SELECT FILE'}
+                      </label>
+                      <input 
+                        type="file" 
+                        id="idcard" 
+                        name="idcard" 
+                        accept="image/jpeg,image/png,image/jpg"
+                        className="hidden"
+                        onChange={handleIdCardChange}
+                        disabled={isSubmitting}
+                      />
+                      
+                      {idCardFile && (
+                        <div className="flex items-center gap-3">
+                          {idCardPreview && (
+                            <div className="w-16 h-16 border-2 border-on-surface overflow-hidden bg-surface-container-lowest">
+                              <img src={idCardPreview} alt="ID preview" className="w-full h-full object-cover grayscale" />
+                            </div>
+                          )}
+                          <div className="font-mono-style text-[11px] text-on-surface-variant uppercase">
+                            <div className="font-label-bold text-on-surface">{idCardFile.name}</div>
+                            <div>{(idCardFile.size / 1024).toFixed(1)} KB</div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Biometric Scan Section */}
                 <div className="border-2 border-on-surface p-6 bg-surface mt-8 relative overflow-hidden">
                   <div className="absolute inset-0 opacity-10 bg-[repeating-linear-gradient(45deg,#1a1c1c_25%,transparent_25%,transparent_75%,#1a1c1c_75%,#1a1c1c),repeating-linear-gradient(45deg,#1a1c1c_25%,#f9f9f9_25%,#f9f9f9_75%,#1a1c1c_75%,#1a1c1c)] bg-[position:0_0,10px_10px] bg-[size:20px_20px]"></div>
                   

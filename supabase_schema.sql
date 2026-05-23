@@ -1,19 +1,28 @@
--- Supabase SQL Schema for IJP - Ishan Janta Party
--- Run this in your Supabase SQL Editor (https://supabase.com/dashboard/project/hbxjcfyuwsbsbrjsnynt/sql/new)
+-- ============================================================
+-- Supabase SQL Schema for IJP - Ishan Janta Party (PRODUCTION)
+-- Run this in: https://supabase.com/dashboard/project/hbxjcfyuwsbsbrjsnynt/sql/new
+-- ============================================================
 
 -- 1. Create Profiles Table (extends auth.users)
 create table if not exists public.profiles (
   id uuid references auth.users on delete cascade primary key,
   codename text not null unique,
   email text not null,
-  sector text not null, -- g9, g10, g11, g12
-  unique_id text not null unique, -- IJP-YYYY-XXXX
+  sector text not null default 'g9',
+  section text not null default 'A' check (section in ('A','B','C','D','E','F','G','H','I','J')),
+  d_no text not null,
+  unique_id text not null unique, -- IJP-2026-XXXXX (last 5 digits of D-Number)
+  id_card_url text,
+  verified boolean not null default false,
   role text not null default 'student' check (role in ('student', 'admin')),
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
 -- Enable RLS on profiles
 alter table public.profiles enable row level security;
+
+-- Enable realtime on profiles
+alter publication supabase_realtime add table public.profiles;
 
 -- 2. Create Complaints Table
 create table if not exists public.complaints (
@@ -31,17 +40,24 @@ create table if not exists public.complaints (
 -- Enable RLS on complaints
 alter table public.complaints enable row level security;
 
--- 3. Trigger Function for auth.users to public.profiles replication
+-- Enable realtime on complaints
+alter publication supabase_realtime add table public.complaints;
+
+-- 3. Trigger Function for auth.users → public.profiles replication
 create or replace function public.handle_new_user()
 returns trigger as $$
 begin
-  insert into public.profiles (id, codename, email, sector, unique_id, role)
+  insert into public.profiles (id, codename, email, sector, section, d_no, unique_id, id_card_url, verified, role)
   values (
     new.id,
     coalesce(new.raw_user_meta_data->>'codename', 'Operative_' || substring(new.id::text, 1, 6)),
     new.email,
     coalesce(new.raw_user_meta_data->>'sector', 'g9'),
-    coalesce(new.raw_user_meta_data->>'unique_id', 'IJP-2026-0000'),
+    coalesce(new.raw_user_meta_data->>'section', 'A'),
+    coalesce(new.raw_user_meta_data->>'d_no', '00000'),
+    coalesce(new.raw_user_meta_data->>'unique_id', 'IJP-2026-00000'),
+    new.raw_user_meta_data->>'id_card_url',
+    false,
     coalesce(new.raw_user_meta_data->>'role', 'student')
   );
   return new;
@@ -57,7 +73,7 @@ create trigger on_auth_user_created
 -- 4. Row Level Security Policies
 
 -- Profiles Policies:
--- Allow anyone to read profiles (helpful for looking up unique_id / email mapping during login)
+-- Allow anyone to read profiles (needed for unique_id / email lookup during login)
 create policy "Allow public read access to profiles"
   on public.profiles for select
   using (true);
@@ -66,6 +82,16 @@ create policy "Allow public read access to profiles"
 create policy "Allow users to update own profile"
   on public.profiles for update
   using (auth.uid() = id);
+
+-- Allow admins to update any profile (for verification toggle)
+create policy "Admins can update any profile"
+  on public.profiles for update
+  using (
+    exists (
+      select 1 from public.profiles
+      where id = auth.uid() and role = 'admin'
+    )
+  );
 
 -- Complaints Policies:
 -- Allow students to view their own complaints
@@ -98,6 +124,48 @@ create policy "Admins can update complaints"
     )
   );
 
--- 5. Seed an Admin User
--- Note: When signing up an admin using Supabase Client, use role='admin' in metadata.
--- Alternatively, manually update a user's role to 'admin' in this table.
+-- ============================================================
+-- 5. Storage Bucket for ID Card Uploads
+-- ============================================================
+
+-- Create the storage bucket (private)
+insert into storage.buckets (id, name, public)
+values ('id-cards', 'id-cards', false)
+on conflict (id) do nothing;
+
+-- Storage Policies:
+
+-- Allow authenticated users to upload their own ID card
+create policy "Users can upload own ID card"
+  on storage.objects for insert
+  to authenticated
+  with check (
+    bucket_id = 'id-cards'
+  );
+
+-- Allow users to read their own uploaded ID card
+create policy "Users can view own ID card"
+  on storage.objects for select
+  to authenticated
+  using (
+    bucket_id = 'id-cards'
+    and auth.uid()::text = (string_to_array(name, '/'))[1]
+  );
+
+-- Allow admins to read ALL uploaded ID cards
+create policy "Admins can view all ID cards"
+  on storage.objects for select
+  to authenticated
+  using (
+    bucket_id = 'id-cards'
+    and exists (
+      select 1 from public.profiles
+      where id = auth.uid() and role = 'admin'
+    )
+  );
+
+-- ============================================================
+-- 6. Notes
+-- ============================================================
+-- After signup, manually set role='admin' for admin accounts:
+--   UPDATE public.profiles SET role = 'admin' WHERE email = 'your-admin@email.com';

@@ -67,36 +67,34 @@ export const AuthProvider = ({ children }) => {
     };
   }, []);
 
-  // 1. Sign Up Operative
-  const signUpOperative = async ({ codename, email, password, sector }) => {
+  // Generate Unique ID from D-Number: IJP-2026-XXXXX (last 5 digits, zero-padded)
+  const generateUniqueIdFromDNo = (dNo) => {
+    // Extract only digits from the D-Number
+    const digitsOnly = dNo.replace(/\D/g, '');
+    // Take last 5 digits, pad with leading zeros if fewer than 5
+    const last5 = digitsOnly.slice(-5).padStart(5, '0');
+    const currentYear = new Date().getFullYear();
+    return `IJP-${currentYear}-${last5}`;
+  };
+
+  // 1. Sign Up Operative (PRODUCTION)
+  const signUpOperative = async ({ codename, email, password, section, dNo, idCardFile }) => {
     try {
-      // Collision-resistant Unique ID generation: IJP-2026-XXXX
-      let uniqueId = '';
-      let isUnique = false;
-      let attempts = 0;
+      // Generate unique ID from D-Number
+      const uniqueId = generateUniqueIdFromDNo(dNo);
 
-      while (!isUnique && attempts < 10) {
-        const randomNum = Math.floor(1000 + Math.random() * 9000); // 4-digit number
-        uniqueId = `IJP-2026-${randomNum}`;
+      // Check if unique_id already exists (D-Number collision)
+      const { data: idCheck } = await supabase
+        .from('profiles')
+        .select('unique_id')
+        .eq('unique_id', uniqueId)
+        .maybeSingle();
 
-        // Query profiles to check if unique_id exists
-        const { data } = await supabase
-          .from('profiles')
-          .select('unique_id')
-          .eq('unique_id', uniqueId)
-          .maybeSingle();
-
-        if (!data) {
-          isUnique = true;
-        }
-        attempts++;
+      if (idCheck) {
+        throw new Error(`D-Number collision: An operative with ID ${uniqueId} already exists. Contact the Directorate.`);
       }
 
-      if (!isUnique) {
-        throw new Error('Failed to generate a unique Operative ID. Please try again.');
-      }
-
-      // Check if username/codename is already taken
+      // Check if codename is already taken
       const { data: nameCheck } = await supabase
         .from('profiles')
         .select('codename')
@@ -108,14 +106,15 @@ export const AuthProvider = ({ children }) => {
       }
 
       // Sign up in Supabase Auth
-      // Role defaults to 'student'
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
             codename,
-            sector,
+            sector: 'g9',
+            section,
+            d_no: dNo,
             unique_id: uniqueId,
             role: 'student',
           },
@@ -123,13 +122,47 @@ export const AuthProvider = ({ children }) => {
       });
 
       if (authError) throw authError;
+
+      // Upload ID card if provided
+      let idCardUrl = null;
+      if (idCardFile && authData.user) {
+        const fileExt = idCardFile.name.split('.').pop().toLowerCase();
+        const filePath = `${authData.user.id}/id-card.${fileExt}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('id-cards')
+          .upload(filePath, idCardFile, {
+            cacheControl: '3600',
+            upsert: true,
+          });
+
+        if (uploadError) {
+          console.warn('ID card upload failed:', uploadError.message);
+          // Don't block signup if upload fails
+        } else {
+          // Store the path (not signed URL) — admin will generate signed URLs to view
+          idCardUrl = filePath;
+
+          // Update the profile with the id_card_url
+          // (the trigger already created the profile, so we update it)
+          const { error: updateError } = await supabase
+            .from('profiles')
+            .update({ id_card_url: idCardUrl })
+            .eq('id', authData.user.id);
+
+          if (updateError) {
+            console.warn('Failed to update profile with ID card URL:', updateError.message);
+          }
+        }
+      }
+
       return { success: true, uniqueId };
     } catch (err) {
       return { success: false, error: err.message };
     }
   };
 
-  // 2. Sign In Operative (accepts email OR Unique ID e.g. IJP-2026-4829)
+  // 2. Sign In Operative (accepts email OR Unique ID e.g. IJP-2026-48290)
   const signInOperative = async ({ loginIdentifier, password }) => {
     try {
       let email = loginIdentifier.trim();

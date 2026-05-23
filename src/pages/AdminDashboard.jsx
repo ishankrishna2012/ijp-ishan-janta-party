@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabaseClient';
@@ -12,7 +12,8 @@ export default function AdminDashboard() {
     totalRecruits: 0,
     pendingComplaints: 0,
     approvedComplaints: 0,
-    redactedComplaints: 0
+    redactedComplaints: 0,
+    unverifiedCount: 0
   });
 
   // DB Data States
@@ -24,6 +25,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [userSearchQuery, setUserSearchQuery] = useState('');
+  const [sectionFilter, setSectionFilter] = useState('ALL');
 
   // Selected Complaint for Edit
   const [selectedComplaint, setSelectedComplaint] = useState(null);
@@ -33,8 +35,12 @@ export default function AdminDashboard() {
   const [updateError, setUpdateError] = useState(null);
   const [updateSuccess, setUpdateSuccess] = useState(false);
 
+  // ID Card viewer
+  const [viewingIdCard, setViewingIdCard] = useState(null);
+  const [idCardSignedUrl, setIdCardSignedUrl] = useState(null);
+
   // Fetch Dashboard Data
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     try {
       setLoading(true);
       
@@ -46,7 +52,8 @@ export default function AdminDashboard() {
           profiles (
             codename,
             unique_id,
-            sector
+            sector,
+            section
           )
         `)
         .order('created_at', { ascending: false });
@@ -69,12 +76,14 @@ export default function AdminDashboard() {
       const pendingC = complaintsData?.filter(c => c.status === 'PENDING').length || 0;
       const approvedC = complaintsData?.filter(c => c.status === 'APPROVED').length || 0;
       const redactedC = complaintsData?.filter(c => c.status === 'REDACTED').length || 0;
+      const unverified = usersData?.filter(u => !u.verified).length || 0;
 
       setMetrics({
         totalRecruits: totalR,
         pendingComplaints: pendingC,
         approvedComplaints: approvedC,
-        redactedComplaints: redactedC
+        redactedComplaints: redactedC,
+        unverifiedCount: unverified
       });
 
     } catch (err) {
@@ -82,11 +91,33 @@ export default function AdminDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchDashboardData();
-  }, []);
+  }, [fetchDashboardData]);
+
+  // Realtime subscriptions
+  useEffect(() => {
+    const complaintsChannel = supabase
+      .channel('admin-complaints-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'complaints' }, () => {
+        fetchDashboardData();
+      })
+      .subscribe();
+
+    const profilesChannel = supabase
+      .channel('admin-profiles-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => {
+        fetchDashboardData();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(complaintsChannel);
+      supabase.removeChannel(profilesChannel);
+    };
+  }, [fetchDashboardData]);
 
   // Update Complaint Status/Response Handler
   const handleUpdateComplaint = async (e) => {
@@ -117,9 +148,6 @@ export default function AdminDashboard() {
         response: editResponse
       }));
 
-      // Refresh dashboard list
-      fetchDashboardData();
-
       setTimeout(() => {
         setUpdateSuccess(false);
       }, 3000);
@@ -128,6 +156,25 @@ export default function AdminDashboard() {
       setUpdateError(err.message);
     } finally {
       setIsUpdating(false);
+    }
+  };
+
+  // Toggle Verification Status
+  const handleToggleVerification = async (userId, currentStatus, userCodename) => {
+    const newStatus = !currentStatus;
+    const action = newStatus ? 'VERIFY' : 'UNVERIFY';
+    const confirm = window.confirm(`${action} operative "${userCodename}"?`);
+    if (!confirm) return;
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ verified: newStatus })
+        .eq('id', userId);
+
+      if (error) throw error;
+    } catch (err) {
+      alert(`Verification update failed: ${err.message}`);
     }
   };
 
@@ -144,9 +191,29 @@ export default function AdminDashboard() {
 
       if (error) throw error;
       alert(`Operative "${userCodename}" has been elevated to Admin status.`);
-      fetchDashboardData();
     } catch (err) {
       alert(`Promotion failed: ${err.message}`);
+    }
+  };
+
+  // View ID Card — generate signed URL
+  const handleViewIdCard = async (idCardUrl, userCodename) => {
+    if (!idCardUrl) {
+      alert('No identity document uploaded by this operative.');
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase.storage
+        .from('id-cards')
+        .createSignedUrl(idCardUrl, 300); // 5 min expiry
+
+      if (error) throw error;
+
+      setViewingIdCard(userCodename);
+      setIdCardSignedUrl(data.signedUrl);
+    } catch (err) {
+      alert(`Failed to retrieve ID card: ${err.message}`);
     }
   };
 
@@ -156,14 +223,17 @@ export default function AdminDashboard() {
     return c.status === statusFilter;
   });
 
-  // Filter users based on query
+  // Filter users based on query and section
   const filteredUsers = users.filter(u => {
     const query = userSearchQuery.toLowerCase();
-    return (
+    const matchesQuery = (
       u.codename.toLowerCase().includes(query) ||
       u.unique_id.toLowerCase().includes(query) ||
-      u.email.toLowerCase().includes(query)
+      u.email.toLowerCase().includes(query) ||
+      (u.d_no && u.d_no.toLowerCase().includes(query))
     );
+    const matchesSection = sectionFilter === 'ALL' || u.section === sectionFilter;
+    return matchesQuery && matchesSection;
   });
 
   const getStatusStyle = (status) => {
@@ -176,10 +246,34 @@ export default function AdminDashboard() {
     }
   };
 
+  const getSectionLabel = (sec) => `Division ${sec}`;
+
   return (
     <div className="bg-background text-on-background font-body-lg min-h-screen overflow-x-hidden selection:bg-primary selection:text-on-primary relative flex">
       {/* Scanline background */}
       <div className="scanlines"></div>
+
+      {/* ID Card Viewer Modal */}
+      {viewingIdCard && idCardSignedUrl && (
+        <div className="fixed inset-0 bg-on-surface/80 z-[100] flex items-center justify-center p-4" onClick={() => { setViewingIdCard(null); setIdCardSignedUrl(null); }}>
+          <div className="bg-surface-container-lowest border-2 border-on-surface bureaucratic-shadow max-w-lg w-full p-6 relative" onClick={e => e.stopPropagation()}>
+            <div className="absolute top-0 right-0 bg-error text-on-error font-mono-style text-mono-style px-3 py-1 border-l-2 border-b-2 border-on-surface">CLASSIFIED</div>
+            <h3 className="font-headline-lg-mobile uppercase text-on-surface mb-4 flex items-center gap-2">
+              <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>badge</span>
+              ID CARD: {viewingIdCard}
+            </h3>
+            <div className="border-2 border-on-surface overflow-hidden bg-surface">
+              <img src={idCardSignedUrl} alt={`ID Card for ${viewingIdCard}`} className="w-full h-auto max-h-[60vh] object-contain" />
+            </div>
+            <button 
+              onClick={() => { setViewingIdCard(null); setIdCardSignedUrl(null); }}
+              className="mt-4 w-full bg-on-surface text-surface-container-lowest font-label-bold text-label-bold uppercase py-3 border-2 border-on-surface bureaucratic-shadow btn-press"
+            >
+              CLOSE DOSSIER
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* SideNavBar */}
       <nav className="hidden md:flex bg-surface-container-highest dark:bg-surface-dim h-screen w-64 border-r-2 border-on-surface fixed left-0 top-0 flex-col p-4 z-40 text-left">
@@ -263,7 +357,7 @@ export default function AdminDashboard() {
             <div>
               <p className="font-mono-style text-mono-style uppercase text-error tracking-widest mb-2 flex items-center gap-2">
                 <span className="material-symbols-outlined text-sm animate-pulse">radar</span>
-                WARNING: OFFICIAL ADMIN CONSOLE
+                LIVE // OFFICIAL ADMIN CONSOLE
               </p>
               <h1 className="font-display-lg text-headline-xl md:text-display-lg text-on-surface uppercase tracking-tighter leading-none">IJP HEADQUARTERS</h1>
               <p className="font-body-lg text-body-lg text-on-surface-variant mt-2 max-w-2xl">
@@ -274,7 +368,7 @@ export default function AdminDashboard() {
           </header>
 
           {/* Quick Metrics Bar */}
-          <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <section className="grid grid-cols-2 md:grid-cols-5 gap-4">
             <div className="bg-surface-container-lowest border-2 border-on-surface p-4 bureaucratic-shadow">
               <div className="font-mono-style text-[10px] text-tertiary uppercase">TOTAL CADRE OPERATIVES</div>
               <div className="font-headline-lg text-4xl text-on-surface mt-1">{metrics.totalRecruits}</div>
@@ -290,6 +384,10 @@ export default function AdminDashboard() {
             <div className="bg-error-container border-2 border-on-surface p-4 bureaucratic-shadow">
               <div className="font-mono-style text-[10px] text-on-error-container uppercase">REDACTED TRANSACTIONS</div>
               <div className="font-headline-lg text-4xl text-on-error-container mt-1">{metrics.redactedComplaints}</div>
+            </div>
+            <div className="bg-surface-variant border-2 border-on-surface p-4 bureaucratic-shadow">
+              <div className="font-mono-style text-[10px] text-on-surface-variant uppercase">UNVERIFIED OPERATIVES</div>
+              <div className="font-headline-lg text-4xl text-on-surface mt-1">{metrics.unverifiedCount}</div>
             </div>
           </section>
 
@@ -364,6 +462,9 @@ export default function AdminDashboard() {
                         <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-[11px] font-mono-style text-on-surface-variant uppercase">
                           <span>TYPE: {complaint.transgression_type}</span>
                           <span>SUBMITTED BY: {complaint.profiles?.codename || 'ANONYMOUS'} ({complaint.user_unique_id})</span>
+                          {complaint.profiles?.section && (
+                            <span>SECTION: {complaint.profiles.section}</span>
+                          )}
                         </div>
                         
                         <p className="font-body-md text-sm text-on-surface-variant mt-3 bg-surface-container-lowest p-2 border border-on-surface/10 line-clamp-2">
@@ -409,6 +510,9 @@ export default function AdminDashboard() {
                       <div><strong className="text-tertiary">INQUIRY TARGET:</strong> {selectedComplaint.target_subject}</div>
                       <div><strong className="text-tertiary">TRANSGRESSION:</strong> {selectedComplaint.transgression_type}</div>
                       <div><strong className="text-tertiary">FILED BY:</strong> {selectedComplaint.profiles?.codename || 'ANONYMOUS'} ({selectedComplaint.user_unique_id})</div>
+                      {selectedComplaint.profiles?.section && (
+                        <div><strong className="text-tertiary">SECTION:</strong> Division {selectedComplaint.profiles.section}</div>
+                      )}
                       <div className="pt-2 border-t border-on-surface/10">
                         <strong className="text-tertiary block mb-1">EVIDENCE DETAILS:</strong>
                         <p className="font-body-md text-xs text-on-surface-variant normal-case bg-surface-container-lowest p-2 border border-on-surface/10 whitespace-pre-wrap max-h-32 overflow-y-auto">
@@ -418,7 +522,7 @@ export default function AdminDashboard() {
                     </div>
 
                     <div>
-                      <label className="block font-label-bold text-label-bold uppercase text-on-surface mb-2">Decree Status Status</label>
+                      <label className="block font-label-bold text-label-bold uppercase text-on-surface mb-2">Decree Status</label>
                       <div className="grid grid-cols-2 gap-2">
                         {['PENDING', 'APPROVED', 'UNDER_INVESTIGATION', 'REDACTED'].map(status => (
                           <button
@@ -476,15 +580,27 @@ export default function AdminDashboard() {
                   <span className="material-symbols-outlined">groups</span>
                   Registered Cadre Operatives ({filteredUsers.length})
                 </h2>
-                <div className="relative max-w-sm w-full">
-                  <input
-                    type="text"
-                    placeholder="SEARCH CODENAME, EMAIL OR ID..."
-                    className="w-full border-2 border-on-surface bg-surface p-2 pl-10 font-mono-style text-xs uppercase focus:outline-none"
-                    value={userSearchQuery}
-                    onChange={(e) => setUserSearchQuery(e.target.value)}
-                  />
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface text-sm">search</span>
+                <div className="flex gap-2">
+                  <div className="relative max-w-xs w-full">
+                    <input
+                      type="text"
+                      placeholder="SEARCH CODENAME, EMAIL, ID, D-NO..."
+                      className="w-full border-2 border-on-surface bg-surface p-2 pl-10 font-mono-style text-xs uppercase focus:outline-none"
+                      value={userSearchQuery}
+                      onChange={(e) => setUserSearchQuery(e.target.value)}
+                    />
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface text-sm">search</span>
+                  </div>
+                  <select
+                    className="border-2 border-on-surface bg-surface p-2 font-mono-style text-xs uppercase"
+                    value={sectionFilter}
+                    onChange={(e) => setSectionFilter(e.target.value)}
+                  >
+                    <option value="ALL">ALL SECTIONS</option>
+                    {['A','B','C','D','E','F','G','H','I','J'].map(s => (
+                      <option key={s} value={s}>DIVISION {s}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
@@ -507,7 +623,9 @@ export default function AdminDashboard() {
                         <th className="p-3 border-r-2 border-on-surface">UNIQUE ID</th>
                         <th className="p-3 border-r-2 border-on-surface">CODENAME</th>
                         <th className="p-3 border-r-2 border-on-surface">EMAIL</th>
-                        <th className="p-3 border-r-2 border-on-surface">SECTOR</th>
+                        <th className="p-3 border-r-2 border-on-surface">SECTION</th>
+                        <th className="p-3 border-r-2 border-on-surface">D-NO</th>
+                        <th className="p-3 border-r-2 border-on-surface">VERIFIED</th>
                         <th className="p-3 border-r-2 border-on-surface">ROLE</th>
                         <th className="p-3">ACTIONS</th>
                       </tr>
@@ -518,7 +636,20 @@ export default function AdminDashboard() {
                           <td className="p-3 border-r-2 border-on-surface font-bold text-primary">{u.unique_id}</td>
                           <td className="p-3 border-r-2 border-on-surface uppercase font-bold">{u.codename}</td>
                           <td className="p-3 border-r-2 border-on-surface normal-case">{u.email}</td>
-                          <td className="p-3 border-r-2 border-on-surface uppercase">{getSectorLabel(u.sector)}</td>
+                          <td className="p-3 border-r-2 border-on-surface uppercase">{getSectionLabel(u.section)}</td>
+                          <td className="p-3 border-r-2 border-on-surface">{u.d_no || '—'}</td>
+                          <td className="p-3 border-r-2 border-on-surface text-center">
+                            <button
+                              onClick={() => handleToggleVerification(u.id, u.verified, u.codename)}
+                              className={`px-2 py-0.5 border border-on-surface text-[10px] font-bold uppercase transition-all btn-press ${
+                                u.verified 
+                                  ? 'bg-secondary text-on-secondary' 
+                                  : 'bg-error-container text-on-error-container'
+                              }`}
+                            >
+                              {u.verified ? '✓ VERIFIED' : '✗ UNVERIFIED'}
+                            </button>
+                          </td>
                           <td className="p-3 border-r-2 border-on-surface uppercase font-bold text-center">
                             <span className={`px-2 py-0.5 border border-on-surface text-[10px] font-bold ${
                               u.role === 'admin' ? 'bg-error text-on-error' : 'bg-surface-dim text-on-surface'
@@ -527,19 +658,30 @@ export default function AdminDashboard() {
                             </span>
                           </td>
                           <td className="p-3 text-center">
-                            {u.role === 'student' ? (
-                              <button
-                                onClick={() => handlePromoteUser(u.id, u.codename)}
-                                className="bg-primary-container text-on-primary-container font-label-bold text-[10px] uppercase border border-on-surface py-1 px-3 bureaucratic-shadow btn-press font-bold transition-all hover:bg-primary hover:text-on-primary"
-                              >
-                                PROMOTE ADMIN
-                              </button>
-                            ) : (
-                              <span className="text-secondary font-bold text-[10px] uppercase flex items-center justify-center gap-1">
-                                <span className="material-symbols-outlined text-xs">verified</span>
-                                ELITE CADRE
-                              </span>
-                            )}
+                            <div className="flex flex-col gap-1">
+                              {u.id_card_url && (
+                                <button
+                                  onClick={() => handleViewIdCard(u.id_card_url, u.codename)}
+                                  className="bg-surface-variant text-on-surface font-label-bold text-[10px] uppercase border border-on-surface py-1 px-2 btn-press transition-all hover:bg-primary-container flex items-center gap-1 justify-center"
+                                >
+                                  <span className="material-symbols-outlined text-xs">badge</span>
+                                  VIEW ID
+                                </button>
+                              )}
+                              {u.role === 'student' ? (
+                                <button
+                                  onClick={() => handlePromoteUser(u.id, u.codename)}
+                                  className="bg-primary-container text-on-primary-container font-label-bold text-[10px] uppercase border border-on-surface py-1 px-2 bureaucratic-shadow btn-press font-bold transition-all hover:bg-primary hover:text-on-primary"
+                                >
+                                  PROMOTE ADMIN
+                                </button>
+                              ) : (
+                                <span className="text-secondary font-bold text-[10px] uppercase flex items-center justify-center gap-1">
+                                  <span className="material-symbols-outlined text-xs">verified</span>
+                                  ELITE CADRE
+                                </span>
+                              )}
+                            </div>
                           </td>
                         </tr>
                       ))}

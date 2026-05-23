@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabaseClient';
@@ -20,7 +20,7 @@ export default function TruthDirectorate() {
   const [loadingComplaints, setLoadingComplaints] = useState(true);
 
   // Fetch student's own complaints
-  const fetchMyComplaints = async () => {
+  const fetchMyComplaints = useCallback(async () => {
     if (!user) return;
     try {
       setLoadingComplaints(true);
@@ -36,11 +36,26 @@ export default function TruthDirectorate() {
     } finally {
       setLoadingComplaints(false);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     fetchMyComplaints();
-  }, [user]);
+  }, [fetchMyComplaints]);
+
+  // Realtime subscription for live complaint updates
+  useEffect(() => {
+    if (!user) return;
+    const channel = supabase
+      .channel('student-complaints-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'complaints' }, () => {
+        fetchMyComplaints();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, fetchMyComplaints]);
 
   const handleSubmitComplaint = async (e) => {
     e.preventDefault();
@@ -78,16 +93,8 @@ export default function TruthDirectorate() {
     }
   };
 
-  // Helper for human-readable sector label
-  const getSectorLabel = (sec) => {
-    switch (sec) {
-      case 'g9': return 'Sector 9 (Initiate)';
-      case 'g10': return 'Sector 10 (Standard)';
-      case 'g11': return 'Sector 11 (Advanced)';
-      case 'g12': return 'Sector 12 (Vanguard)';
-      default: return 'Sector 9 (Initiate)';
-    }
-  };
+  // Helper for section label
+  const getSectionLabel = (sec) => sec ? `Division ${sec}` : 'Division A';
 
   // Helper for styling status chips
   const getStatusStyle = (status) => {
@@ -199,7 +206,7 @@ export default function TruthDirectorate() {
           <header className="border-b-4 border-on-surface pb-6 mb-12">
             <p className="font-mono-style text-mono-style uppercase text-primary tracking-widest mb-2 flex items-center gap-2">
               <span className="material-symbols-outlined text-sm">visibility</span>
-              CLASSIFIED DOSSIER #849-B // SECTOR: {user?.sector.toUpperCase()}
+              CLASSIFIED DOSSIER #849-B // SECTION: DIVISION {user?.section || 'A'}
             </p>
             <h1 className="font-display-lg text-headline-xl md:text-display-lg uppercase tracking-tighter text-on-background glitch-hover inline-block">THE TRUTH DIRECTORATE</h1>
             <p className="font-body-lg text-body-lg text-on-surface-variant mt-4 max-w-2xl border-l-4 border-primary pl-4">

@@ -53,16 +53,8 @@ export default function StudentHub() {
     setHasVoted(true);
   };
 
-  // Convert sector value to human-readable sector
-  const getSectorLabel = (sec) => {
-    switch (sec) {
-      case 'g9': return 'Sector 9 (Initiate)';
-      case 'g10': return 'Sector 10 (Standard)';
-      case 'g11': return 'Sector 11 (Advanced)';
-      case 'g12': return 'Sector 12 (Vanguard)';
-      default: return 'Sector 9 (Initiate)';
-    }
-  };
+  // Convert section to human-readable label
+  const getSectionLabel = (sec) => sec ? `Division ${sec}` : 'Division A';
 
   return (
     <div className="bg-background text-on-background font-body-lg min-h-screen overflow-x-hidden selection:bg-primary selection:text-on-primary relative flex">
@@ -84,8 +76,8 @@ export default function StudentHub() {
         <div className="mb-6 bg-surface p-3 border-2 border-on-surface text-xs font-mono-style uppercase">
           <div className="text-tertiary">CODENAME:</div>
           <div className="font-bold text-on-surface text-sm truncate">{user?.codename}</div>
-          <div className="text-tertiary mt-2">SECTOR:</div>
-          <div className="font-bold text-on-surface text-[10px] truncate">{getSectorLabel(user?.sector)}</div>
+          <div className="text-tertiary mt-2">SECTION:</div>
+          <div className="font-bold text-on-surface text-[10px] truncate">{getSectionLabel(user?.section)}</div>
           <div className="text-tertiary mt-2">ID:</div>
           <div className="font-bold text-primary text-[10px]">{user?.unique_id}</div>
         </div>
@@ -151,7 +143,7 @@ export default function StudentHub() {
           <header className="mb-8 border-b-4 border-on-surface pb-6 text-left">
             <div className="inline-block bg-on-surface text-surface-container-lowest px-2 py-1 font-mono-style text-mono-style uppercase mb-4 shadow-[2px_2px_0px_0px_#ff9933]">
               <span className="material-symbols-outlined text-[14px] align-text-bottom mr-1" style={{ fontVariationSettings: "'FILL' 1" }}>lock</span>
-              CLASSIFIED: {user?.sector.toUpperCase()} EYES ONLY
+              CLASSIFIED: DIVISION {user?.section || 'A'} EYES ONLY
             </div>
             <h1 className="font-display-lg text-headline-xl md:text-display-lg text-on-surface uppercase tracking-tighter leading-none">OPERATION: NINTH GRADE</h1>
             <p className="font-body-lg text-body-lg text-on-surface-variant mt-4 max-w-2xl">
