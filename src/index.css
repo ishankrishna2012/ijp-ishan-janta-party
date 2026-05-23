@@ -1,0 +1,146 @@
+/* Global Neo-Brutalist Styles & Textures for IJP */
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Custom Textures */
+.texture-noise {
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.05;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  z-index: 9999;
+}
+
+.texture-scanline {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.06) 50%, rgba(0,0,0,0.06));
+  background-size: 100% 4px;
+  pointer-events: none;
+  z-index: 9998;
+}
+
+/* scanline-bg used in login */
+.scanline-bg {
+  background: linear-gradient(
+      to bottom,
+      transparent 50%,
+      rgba(0, 0, 0, 0.05) 51%
+  );
+  background-size: 100% 4px;
+  animation: panBg 10s linear infinite;
+}
+
+@keyframes panBg {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 100px; }
+}
+
+/* Marquee Animation */
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: inline-block;
+  padding-left: 100%;
+  animation: marquee 25s linear infinite;
+}
+
+.animate-marquee-loop {
+  animation: marquee 30s linear infinite;
+}
+
+/* Progress bar animation used in login */
+.progress-bar-anim {
+  animation: loadingBar 4s ease-in-out infinite;
+}
+
+@keyframes loadingBar {
+  0% { width: 0%; left: 0; }
+  50% { width: 100%; left: 0; }
+  100% { width: 0%; left: 100%; }
+}
+
+/* Glitch effects */
+.glitch-text:hover {
+  animation: glitch 0.2s cubic-bezier(.25, .46, .45, .94) both infinite;
+  color: #ba1a1a !important;
+}
+
+.glitch-hover:hover {
+  animation: glitch 0.2s cubic-bezier(.25, .46, .45, .94) both infinite;
+  color: #ff9933 !important;
+}
+
+@keyframes glitch {
+  0% { transform: translate(0) }
+  20% { transform: translate(-2px, 2px) }
+  40% { transform: translate(-2px, -2px) }
+  60% { transform: translate(2px, 2px) }
+  80% { transform: translate(2px, -2px) }
+  100% { transform: translate(0) }
+}
+
+/* Neo-Brutalist Layouts & elevation */
+.bureaucratic-shadow {
+  box-shadow: 4px 4px 0px 0px rgba(0,0,0,1);
+}
+
+.bureaucratic-shadow-hover:hover {
+  box-shadow: 0px 0px 0px 0px rgba(0,0,0,1);
+  transform: translate(4px, 4px);
+}
+
+.bureaucratic-border {
+  border: 2px solid #1a1c1c;
+}
+
+.hard-shadow {
+  box-shadow: 4px 4px 0px 0px #1a1c1c;
+}
+
+.hard-shadow-lg {
+  box-shadow: 8px 8px 0px 0px #1a1c1c;
+}
+
+.btn-press:active {
+  transform: translate(4px, 4px);
+  box-shadow: 0px 0px 0px 0px #1a1c1c;
+}
+
+.stamp {
+  transform: rotate(-15deg);
+  border: 4px solid #ba1a1a;
+  color: #ba1a1a;
+  padding: 8px 16px;
+  display: inline-block;
+  font-family: 'Anton', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0.8;
+}
+
+/* Scrollbar customization */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #eeeeee;
+  border-left: 2px solid #1a1c1c;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #8f4e00;
+  border: 2px solid #1a1c1c;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ff9933;
+}

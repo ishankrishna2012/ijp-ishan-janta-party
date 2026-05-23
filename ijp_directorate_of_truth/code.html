@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Directorate of Truth - Complaints &amp; Newsroom</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Anton&amp;family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed": "#1b1b1b",
+                        "tertiary-fixed-dim": "#c6c6c6",
+                        "primary-container": "#ff9933",
+                        "primary-fixed": "#ffdcc2",
+                        "on-primary-container": "#693800",
+                        "secondary-fixed-dim": "#72de5c",
+                        "on-primary": "#ffffff",
+                        "tertiary": "#5e5e5e",
+                        "primary-fixed-dim": "#ffb77a",
+                        "on-error-container": "#93000a",
+                        "inverse-on-surface": "#f0f1f1",
+                        "error-container": "#ffdad6",
+                        "surface-dim": "#dadada",
+                        "inverse-primary": "#ffb77a",
+                        "on-secondary-container": "#067500",
+                        "on-error": "#ffffff",
+                        "tertiary-container": "#b2b2b2",
+                        "surface-variant": "#e2e2e2",
+                        "surface-container-low": "#f3f3f4",
+                        "surface": "#f9f9f9",
+                        "on-tertiary-fixed-variant": "#474747",
+                        "secondary": "#056e00",
+                        "outline-variant": "#dbc2b0",
+                        "surface-container-high": "#e8e8e8",
+                        "surface-bright": "#f9f9f9",
+                        "secondary-fixed": "#8dfc75",
+                        "background": "#f9f9f9",
+                        "on-background": "#1a1c1c",
+                        "on-primary-fixed-variant": "#6d3a00",
+                        "surface-tint": "#8f4e00",
+                        "surface-container": "#eeeeee",
+                        "error": "#ba1a1a",
+                        "secondary-container": "#8dfc75",
+                        "on-primary-fixed": "#2e1500",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed": "#012200",
+                        "surface-container-highest": "#e2e2e2",
+                        "primary": "#8f4e00",
+                        "on-secondary-fixed-variant": "#035300",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface": "#1a1c1c",
+                        "inverse-surface": "#2f3131",
+                        "tertiary-fixed": "#e2e2e2",
+                        "on-surface-variant": "#554336",
+                        "on-tertiary": "#ffffff",
+                        "outline": "#887364",
+                        "on-tertiary-container": "#444444"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "unit": "8px",
+                        "margin-desktop": "64px",
+                        "margin-mobile": "16px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "label-bold": ["Inter"],
+                        "headline-lg": ["Anton"],
+                        "mono-style": ["Inter"],
+                        "headline-lg-mobile": ["Anton"],
+                        "headline-xl": ["Anton"],
+                        "display-lg": ["Anton"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "160%", "fontWeight": "400" }],
+                        "label-bold": ["14px", { "lineHeight": "120%", "letterSpacing": "0.05em", "fontWeight": "700" }],
+                        "headline-lg": ["48px", { "lineHeight": "110%", "fontWeight": "400" }],
+                        "mono-style": ["12px", { "lineHeight": "120%", "letterSpacing": "0.1em", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["36px", { "lineHeight": "110%", "fontWeight": "400" }],
+                        "headline-xl": ["64px", { "lineHeight": "110%", "fontWeight": "400" }],
+                        "display-lg": ["96px", { "lineHeight": "100%", "letterSpacing": "0.02em", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "150%", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            position: relative;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noiseFilter)"/></svg>');
+            opacity: 0.05;
+            pointer-events: none;
+            z-index: 50;
+        }
+        .scanlines {
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+            background-size: 100% 4px;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 49;
+        }
+        .glitch-hover:hover {
+            animation: glitch 0.2s cubic-bezier(.25, .46, .45, .94) both infinite;
+            color: #ff9933; /* primary-container */
+        }
+        @keyframes glitch {
+            0% { transform: translate(0) }
+            20% { transform: translate(-2px, 2px) }
+            40% { transform: translate(-2px, -2px) }
+            60% { transform: translate(2px, 2px) }
+            80% { transform: translate(2px, -2px) }
+            100% { transform: translate(0) }
+        }
+        .bureaucratic-border {
+            border: 2px solid #1a1c1c;
+        }
+        .hard-shadow {
+            box-shadow: 4px 4px 0px 0px #1a1c1c;
+        }
+        .hard-shadow-lg {
+            box-shadow: 8px 8px 0px 0px #1a1c1c;
+        }
+        .btn-press:active {
+            transform: translate(4px, 4px);
+            box-shadow: 0px 0px 0px 0px #1a1c1c;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col antialiased font-body-lg">
+<div class="scanlines"></div>
+<!-- TopAppBar -->
+<nav class="bg-background dark:bg-on-background docked full-width top-0 border-b-2 border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-40 hidden md:flex">
+<div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4">
+<div class="font-headline-lg text-headline-lg text-primary uppercase tracking-tighter">IJP</div>
+<div class="flex space-x-8">
+<a class="text-on-surface hover:text-primary font-label-bold text-label-bold hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all" href="#">MINISTRIES</a>
+<a class="text-primary border-b-2 border-primary pb-1 font-label-bold text-label-bold scale-95 transition-transform duration-100" href="#">PROPAGANDA</a>
+<a class="text-on-surface hover:text-primary font-label-bold text-label-bold hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all" href="#">MANIFESTO</a>
+</div>
+<button class="bureaucratic-border bg-primary-container text-on-primary-container font-label-bold text-label-bold px-4 py-2 uppercase hard-shadow btn-press transition-all">
+                JOIN THE MOVEMENT
+            </button>
+</div>
+</nav>
+<!-- Mobile Top Header (Fallback for when side nav is hidden) -->
+<header class="md:hidden bg-background border-b-2 border-on-surface p-4 flex justify-between items-center z-40 relative">
+<div class="font-headline-lg-mobile text-headline-lg-mobile text-primary uppercase tracking-tighter">IJP</div>
+<button class="bureaucratic-border bg-primary-container text-on-primary-container px-3 py-1 font-label-bold text-label-bold uppercase hard-shadow btn-press">JOIN</button>
+</header>
+<!-- Main Layout: Side Nav + Content -->
+<div class="flex flex-1 relative z-10 w-full max-w-[container-max] mx-auto">
+<!-- SideNavBar -->
+<aside class="hidden md:flex flex-col w-64 border-r-2 border-on-surface bg-surface-container-highest dark:bg-surface-dim h-full min-h-screen sticky top-0 p-4 shrink-0">
+<div class="mb-8 border-b-2 border-on-surface pb-4">
+<div class="w-16 h-16 bg-surface-variant bureaucratic-border mb-4 flex items-center justify-center overflow-hidden">
+<img alt="IJP Directorate Seal" class="w-full h-full object-cover grayscale opacity-80" data-alt="A distressed, vintage political seal or stamp, high contrast black and white with a stark institutional aesthetic, bureaucratic brutalism style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_thJwJgA_2GoOBID4u2NLF_Ebg2jApCTC6IcOBPfVP_QVWisbRWFJnCcritCAuNx1bJV3blZpIhxjoezmUI3EwpGJf-vcRPFYAAZE_FFXKUYukN6JY-m3JgHW90-KaP_0_rJUv0JzX6ntpcjTiiALBYy5oH-la4xABYYvK53gyhni4hoszV9TF148LqeH6lO9n6NIXpi7RPkBkpFC5zK87klz44lNJTUSzwpVuVGHyDO4-ptAbihS8zMierhXuLyltJyDLI2jvQ"/>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface uppercase leading-none">DIRECTORATE</h2>
+<p class="font-mono-style text-mono-style text-on-surface mt-2 uppercase tracking-widest text-primary">CLASS-A ACCESS</p>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center space-x-3 p-3 text-on-surface-variant hover:bg-surface-variant font-label-bold text-label-bold uppercase hover:bg-primary-container hover:text-on-primary-container transition-colors bureaucratic-border border-transparent hover:border-on-surface hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">school</span>
+<span>Grade 9 Hub</span>
+</a>
+<a class="flex items-center space-x-3 p-3 text-on-surface-variant hover:bg-surface-variant font-label-bold text-label-bold uppercase hover:bg-primary-container hover:text-on-primary-container transition-colors bureaucratic-border border-transparent hover:border-on-surface hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">analytics</span>
+<span>Homework Tracker</span>
+</a>
+<a class="flex items-center space-x-3 p-3 bg-secondary-container text-on-secondary-container border-2 border-on-surface shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] font-label-bold text-label-bold uppercase translate-x-1 duration-75" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">campaign</span>
+<span>Reporting Tools</span>
+</a>
+</nav>
+<div class="mt-auto pt-8 border-t-2 border-on-surface">
+<button class="w-full bg-primary text-on-primary font-label-bold text-label-bold p-3 uppercase bureaucratic-border hard-shadow btn-press hover:bg-primary-container hover:text-on-primary-container transition-colors">
+                    ENLIST NOW
+                </button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 px-margin-mobile md:px-margin-desktop py-8 md:py-12 space-y-16">
+<!-- Page Header -->
+<header class="border-b-4 border-on-surface pb-6 mb-12">
+<p class="font-mono-style text-mono-style uppercase text-primary tracking-widest mb-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">visibility</span>
+                    CLASSIFIED DOSSIER #849-B
+                </p>
+<h1 class="font-display-lg text-headline-xl md:text-display-lg uppercase tracking-tighter text-on-background glitch-hover inline-block">THE TRUTH DIRECTORATE</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-4 max-w-2xl border-l-4 border-primary pl-4">
+                    Submit anonymous reports, consume state-sanctioned narratives, and distribute approved digital munitions. Compliance is mandatory.
+                </p>
+</header>
+<!-- Section 1: Anonymous Complaint Portal -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<div class="lg:col-span-5 bg-surface-container-highest p-6 md:p-8 bureaucratic-border hard-shadow-lg relative overflow-hidden">
+<div class="absolute top-0 right-0 bg-primary text-on-primary font-mono-style text-mono-style px-3 py-1 bureaucratic-border border-t-0 border-r-0">FORM-TR-01</div>
+<h2 class="font-headline-lg-mobile md:font-headline-lg uppercase tracking-tight text-on-surface mb-6 flex items-center gap-3">
+<span class="material-symbols-outlined text-4xl text-primary">fingerprint</span>
+                        ANONYMOUS REPORT
+                    </h2>
+<form class="space-y-6 relative z-10">
+<div>
+<label class="block font-label-bold text-label-bold uppercase text-on-surface mb-2">Subject of Inquiry</label>
+<input class="w-full bg-surface-lowest bureaucratic-border p-3 font-mono-style text-mono-style uppercase focus:outline-none focus:border-secondary focus:ring-0 transition-colors" placeholder="ENTER TARGET ID OR NAME" type="text"/>
+</div>
+<div>
+<label class="block font-label-bold text-label-bold uppercase text-on-surface mb-2">Nature of Transgression</label>
+<select class="w-full bg-surface-lowest bureaucratic-border p-3 font-mono-style text-mono-style uppercase focus:outline-none focus:border-secondary focus:ring-0 transition-colors appearance-none">
+<option>IDEOLOGICAL DEVIANCE</option>
+<option>UNAUTHORIZED MEME DISTRIBUTION</option>
+<option>FAILURE TO SUBMIT HOMEWORK</option>
+<option>OTHER (SPECIFY IN DETAILS)</option>
+</select>
+</div>
+<div>
+<label class="block font-label-bold text-label-bold uppercase text-on-surface mb-2">Detailed Account</label>
+<textarea class="w-full bg-surface-lowest bureaucratic-border p-3 font-body-md text-body-md focus:outline-none focus:border-secondary focus:ring-0 transition-colors" placeholder="Provide actionable intelligence..." rows="4"></textarea>
+</div>
+<div class="flex items-center gap-3 p-4 bg-error-container border-2 border-error">
+<span class="material-symbols-outlined text-error">warning</span>
+<p class="font-mono-style text-mono-style text-on-error-container uppercase">Falsifying reports is a Class-3 offense punishable by immediate suspension.</p>
+</div>
+<button class="w-full bg-on-surface text-on-primary font-headline-lg-mobile text-headline-lg-mobile py-4 uppercase bureaucratic-border hard-shadow btn-press hover:bg-primary transition-colors flex justify-center items-center gap-2" type="button">
+                            SUBMIT TO DIRECTORATE
+                            <span class="material-symbols-outlined">send</span>
+</button>
+</form>
+</div>
+<div class="lg:col-span-7 flex flex-col justify-center h-full min-h-[400px] bg-on-background relative bureaucratic-border overflow-hidden group">
+<img alt="Surveillance Aesthetic" class="absolute inset-0 w-full h-full object-cover opacity-40 mix-blend-luminosity group-hover:scale-105 transition-transform duration-700" data-alt="Dark, moody surveillance camera footage of an empty concrete corridor, high contrast, gritty texture, dystopian institutional vibe, heavily shadowed." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCCqzh9lKmAu6hiiZzN_61S5kbIKEg24Q_xbOca4amP7Lv13iqPuN39jWQfm_UOaq66hBIGLq-FxoILIfNN6xYpA98snOoKIScpRY52S3MsjYY24F-USFfTqUK_5xbU9uk1Dxozvi2x70mKus9S0i6u21_eEAU3lWdh1ut_JC_2E1ZZK2U7JGVmQhR200yNAiYnD39JtbxUHZ7Wv_TCE3Ewp8VS1Ours1YXVXjaoKZSGCFDebJaqhk6jmPioC37mu7CCeWk36r-EQ"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+<div class="relative z-10 p-8 text-on-primary">
+<span class="inline-block bg-error text-on-error font-mono-style text-mono-style px-2 py-1 mb-4 uppercase tracking-widest">URGENT BROADCAST</span>
+<h3 class="font-headline-lg text-headline-lg md:text-headline-xl uppercase tracking-tighter leading-none mb-4 text-primary-fixed">EYES EVERYWHERE</h3>
+<p class="font-body-lg text-body-lg max-w-md border-l-2 border-primary-fixed pl-4">The Directorate commends citizen #4992 for uncovering the recent cafeteria plot. Vigilance is our strongest weapon.</p>
+</div>
+</div>
+</section>
+<!-- Section 2: The Ministry Newsroom -->
+<section class="space-y-8">
+<div class="flex justify-between items-end border-b-2 border-on-surface pb-4">
+<h2 class="font-headline-lg text-headline-lg md:text-headline-xl uppercase tracking-tighter">THE MINISTRY NEWSROOM</h2>
+<a class="font-mono-style text-mono-style text-primary hover:underline uppercase hidden md:block" href="#">VIEW ALL PROPAGANDA</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Article Card 1 -->
+<article class="bg-surface bureaucratic-border hard-shadow group cursor-pointer relative overflow-hidden flex flex-col h-full">
+<div class="absolute top-0 left-0 bg-secondary text-on-secondary font-mono-style text-mono-style px-2 py-1 z-10 bureaucratic-border border-t-0 border-l-0">APPROVED</div>
+<div class="h-48 overflow-hidden border-b-2 border-on-surface bg-on-surface">
+<img alt="News Image" class="w-full h-full object-cover grayscale mix-blend-multiply opacity-80 group-hover:scale-110 transition-transform duration-500" data-alt="A massive brutalist concrete building towering over a courtyard, dramatic low-angle shot, stark shadows, high contrast black and white, oppressive yet majestic architectural style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDe36SRgvTQy6kswZKwdDf0AZEdSETy2yZYuJ0sIK8tb7Kbre8T1MCZKLnP4yS1Q01-rpEHJVo4L5sKFfa1DL1plH7lDbqIeWEUckABIGoFQCnVBzJlGjen_JaIF-D638RC3CMqLij7l1GDCZzPTQ8LZcdIxOK1RZDFHUlcF3YsZpefKITYnOnPp0IxthI2kqLhlnxB59sdeIdnyPlXBAnsmEu03rZFwX_9WX3U-tFrP4FmulpuqfeS9oSmw_eGQXobHWXt651HIQ"/>
+</div>
+<div class="p-5 flex-1 flex flex-col">
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile uppercase tracking-tight leading-none mb-3 group-hover:text-primary transition-colors">NEW CURRICULUM MANDATE ISSUED</h3>
+<p class="font-body-md text-body-md text-on-surface-variant flex-1 line-clamp-3 mb-4">The Ministry of Education announces immediate implementation of the revised historical syllabus. All prior textbooks are to be surrendered to the nearest processing center.</p>
+<div class="flex items-center justify-between mt-auto pt-4 border-t-2 border-surface-dim">
+<span class="font-mono-style text-mono-style text-tertiary">AUTHOR: IJP-CENTRAL</span>
+<span class="material-symbols-outlined text-primary group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</div>
+</div>
+</article>
+<!-- Article Card 2 -->
+<article class="bg-surface bureaucratic-border hard-shadow group cursor-pointer relative overflow-hidden flex flex-col h-full">
+<div class="absolute top-0 left-0 bg-error text-on-error font-mono-style text-mono-style px-2 py-1 z-10 bureaucratic-border border-t-0 border-l-0">MANDATORY READING</div>
+<div class="h-48 overflow-hidden border-b-2 border-on-surface bg-primary-container">
+<img alt="News Image" class="w-full h-full object-cover mix-blend-luminosity opacity-70 group-hover:scale-110 transition-transform duration-500" data-alt="A crowd of anonymous people standing in uniform rows, shot from a high angle, strong geometric composition, slightly blurry or distorted to imply surveillance footage, high contrast." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZ1qCwG-vZEqgh_-vSZ3Q9_nedzsCDYlu8pP7R0Y5j3h0fkbNwY63YspVvNnqh73z5a6XEFsfwnDd0BxlFxs3e03t6oY6w2G4WzTJM-JLPKC6GDJceAq2YoPyQ4VmJCylGjaBnvyl7y59pgLxuGKhejZa-_Eb05cuVJeIH6jthZQCpEmcxZ0dqrs4gv1zhSs1DHSJTB84xj87ard_UYCL6r9k1wawPV8VCFxFWDq4l_fn5AMiZesiCFxoudjfH-soUEA5S69-S7g"/>
+</div>
+<div class="p-5 flex-1 flex flex-col">
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile uppercase tracking-tight leading-none mb-3 group-hover:text-primary transition-colors">ATTENDANCE QUOTAS EXCEEDED</h3>
+<p class="font-body-md text-body-md text-on-surface-variant flex-1 line-clamp-3 mb-4">Sector 4 reports 110% compliance in morning assemblies. The Directorate rewards Sector 4 with an extra 5 minutes of sanctioned leisure time.</p>
+<div class="flex items-center justify-between mt-auto pt-4 border-t-2 border-surface-dim">
+<span class="font-mono-style text-mono-style text-tertiary">AUTHOR: MIN-STATISTICS</span>
+<span class="material-symbols-outlined text-primary group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</div>
+</div>
+</article>
+<!-- Article Card 3 -->
+<article class="bg-surface-container-highest bureaucratic-border hard-shadow group cursor-pointer relative overflow-hidden flex flex-col h-full md:col-span-2 lg:col-span-1">
+<div class="p-5 flex-1 flex flex-col justify-center items-center text-center border-4 border-on-surface m-2 border-dashed">
+<span class="material-symbols-outlined text-6xl text-on-surface-variant mb-4">block</span>
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile uppercase tracking-tight text-on-surface-variant mb-2">CONTENT REDACTED</h3>
+<p class="font-mono-style text-mono-style bg-on-surface text-on-primary px-2 py-1">CLEARANCE LEVEL NOT MET</p>
+</div>
+</article>
+</div>
+</section>
+</main>
+</div>
+<!-- Footer -->
+<footer class="bg-on-tertiary-fixed dark:bg-surface-container-lowest w-full py-8 px-margin-mobile md:px-margin-desktop grid grid-cols-1 md:grid-cols-2 gap-gutter border-t-2 border-on-surface relative z-40">
+<div>
+<div class="font-headline-xl text-headline-xl text-primary uppercase tracking-tighter mb-4">IJP</div>
+<p class="font-mono-style text-mono-style uppercase text-tertiary-fixed-dim">© 1984 ISHAN JANTA PARTY. ALL TRUTHS RESERVED.</p>
+</div>
+<div class="flex flex-col md:items-end justify-center space-y-2">
+<a class="font-mono-style text-mono-style uppercase text-tertiary-fixed-dim hover:text-primary hover:bg-primary hover:text-on-primary px-2 transition-all inline-block w-fit" href="#">LEGAL LIES</a>
+<a class="font-mono-style text-mono-style uppercase text-tertiary-fixed-dim hover:text-primary hover:bg-primary hover:text-on-primary px-2 transition-all inline-block w-fit" href="#">PRIVACY ILLUSION</a>
+<a class="font-mono-style text-mono-style uppercase text-tertiary-fixed-dim hover:text-primary hover:bg-primary hover:text-on-primary px-2 transition-all inline-block w-fit" href="#">STUDENT PORTAL</a>
+</div>
+</footer>
+</body></html>

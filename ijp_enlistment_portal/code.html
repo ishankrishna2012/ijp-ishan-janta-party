@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>IJP Enlistment Portal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Anton&amp;family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary": "#056e00",
+                        "on-secondary-fixed-variant": "#035300",
+                        "tertiary-fixed-dim": "#c6c6c6",
+                        "surface-container-lowest": "#ffffff",
+                        "surface": "#f9f9f9",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed-variant": "#6d3a00",
+                        "on-primary-container": "#693800",
+                        "on-secondary-fixed": "#012200",
+                        "surface-container-highest": "#e2e2e2",
+                        "on-background": "#1a1c1c",
+                        "surface-tint": "#8f4e00",
+                        "surface-container-high": "#e8e8e8",
+                        "inverse-surface": "#2f3131",
+                        "tertiary-fixed": "#e2e2e2",
+                        "secondary-fixed-dim": "#72de5c",
+                        "primary-fixed": "#ffdcc2",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed": "#2e1500",
+                        "background": "#f9f9f9",
+                        "on-tertiary-container": "#444444",
+                        "surface-container": "#eeeeee",
+                        "surface-container-low": "#f3f3f4",
+                        "on-surface": "#1a1c1c",
+                        "on-error-container": "#93000a",
+                        "tertiary-container": "#b2b2b2",
+                        "surface-variant": "#e2e2e2",
+                        "surface-dim": "#dadada",
+                        "secondary-container": "#8dfc75",
+                        "on-surface-variant": "#554336",
+                        "outline-variant": "#dbc2b0",
+                        "on-secondary-container": "#067500",
+                        "on-tertiary-fixed": "#1b1b1b",
+                        "primary-fixed-dim": "#ffb77a",
+                        "error-container": "#ffdad6",
+                        "error": "#ba1a1a",
+                        "on-tertiary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "primary": "#8f4e00",
+                        "inverse-primary": "#ffb77a",
+                        "secondary-fixed": "#8dfc75",
+                        "on-tertiary-fixed-variant": "#474747",
+                        "tertiary": "#5e5e5e",
+                        "surface-bright": "#f9f9f9",
+                        "primary-container": "#ff9933",
+                        "inverse-on-surface": "#f0f1f1",
+                        "outline": "#887364"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "margin-desktop": "64px",
+                        "margin-mobile": "16px",
+                        "container-max": "1280px",
+                        "unit": "8px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Anton"],
+                        "label-bold": ["Inter"],
+                        "mono-style": ["Inter"],
+                        "headline-lg-mobile": ["Anton"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-xl": ["Anton"],
+                        "headline-lg": ["Anton"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["96px", { "lineHeight": "100%", "letterSpacing": "0.02em", "fontWeight": "400" }],
+                        "label-bold": ["14px", { "lineHeight": "120%", "letterSpacing": "0.05em", "fontWeight": "700" }],
+                        "mono-style": ["12px", { "lineHeight": "120%", "letterSpacing": "0.1em", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["36px", { "lineHeight": "110%", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "150%", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "160%", "fontWeight": "400" }],
+                        "headline-xl": ["64px", { "lineHeight": "110%", "fontWeight": "400" }],
+                        "headline-lg": ["48px", { "lineHeight": "110%", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noiseFilter)" opacity="0.05"/></svg>');
+            background-color: theme('colors.surface-container-highest');
+        }
+        .scanlines {
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.05) 50%, rgba(0,0,0,0.05));
+            background-size: 100% 4px;
+            pointer-events: none;
+        }
+        .bureaucratic-shadow {
+            box-shadow: 4px 4px 0px 0px rgba(0,0,0,1);
+        }
+        .bureaucratic-shadow-hover:hover {
+            box-shadow: 0px 0px 0px 0px rgba(0,0,0,1);
+            transform: translate(4px, 4px);
+        }
+        .input-form {
+            border: 2px solid theme('colors.on-surface');
+            background-color: theme('colors.surface-container-lowest');
+        }
+        .input-form:focus {
+            outline: none;
+            border-color: theme('colors.secondary');
+        }
+        input[type="checkbox"] {
+            appearance: none;
+            background-color: theme('colors.surface-container-lowest');
+            margin: 0;
+            font: inherit;
+            color: currentColor;
+            width: 1.15em;
+            height: 1.15em;
+            border: 2px solid theme('colors.on-surface');
+            display: grid;
+            place-content: center;
+        }
+        input[type="checkbox"]::before {
+            content: "";
+            width: 0.65em;
+            height: 0.65em;
+            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+            transform: scale(0);
+            transform-origin: bottom left;
+            transition: 120ms transform ease-in-out;
+            box-shadow: inset 1em 1em theme('colors.on-surface');
+            background-color: theme('colors.on-surface');
+        }
+        input[type="checkbox"]:checked::before {
+            transform: scale(1);
+        }
+        /* Custom X checkmark overriding the polygon above for the bureaucratic feel */
+        input[type="checkbox"]::before {
+            clip-path: polygon(20% 0%, 0% 20%, 30% 50%, 0% 80%, 20% 100%, 50% 70%, 80% 100%, 100% 80%, 70% 50%, 100% 20%, 80% 0%, 50% 30%);
+            background-color: theme('colors.on-surface');
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-on-surface font-body-md overflow-x-hidden relative flex flex-col items-center justify-center py-12 px-margin-mobile md:px-margin-desktop">
+<div class="scanlines absolute inset-0 z-50"></div>
+<!-- Main Enlistment Dossier -->
+<main class="w-full max-w-[800px] relative z-10">
+<!-- Tab / Header -->
+<div class="flex items-end mb-[-2px]">
+<div class="bg-surface-container-lowest border-2 border-b-0 border-on-surface px-6 py-2 rounded-t-sm z-20 relative">
+<span class="font-mono-style text-mono-style uppercase tracking-widest text-on-surface">FORM IJP-99</span>
+</div>
+<div class="flex-grow border-b-2 border-on-surface"></div>
+<div class="pb-2 pl-4">
+<span class="font-mono-style text-mono-style text-on-surface-variant">CLASSIFIED // LEVEL 1</span>
+</div>
+</div>
+<!-- Document Body -->
+<div class="bg-surface-container-lowest border-2 border-on-surface p-8 md:p-12 bureaucratic-shadow relative">
+<!-- Redaction Bar Decoration -->
+<div class="absolute top-8 right-8 w-32 h-6 bg-on-surface flex items-center justify-center group cursor-help transition-all duration-300 hover:bg-transparent hover:border-2 hover:border-on-surface">
+<span class="font-mono-style text-mono-style text-surface-container-lowest group-hover:text-error transition-colors">TOP SECRET</span>
+</div>
+<!-- Headers -->
+<div class="mb-10 text-center border-b-2 border-on-surface pb-8">
+<span class="material-symbols-outlined text-display-lg text-primary mb-4" data-icon="policy" data-weight="fill" style="font-variation-settings: 'FILL' 1;">policy</span>
+<h1 class="font-display-lg text-headline-lg-mobile md:text-display-lg uppercase tracking-tighter text-on-surface leading-none mb-2">OFFICIAL ENLISTMENT</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-lg mx-auto">MANDATORY REGISTRATION FOR ALL CADRE OPERATIVES.</p>
+</div>
+<!-- Form -->
+<form action="#" class="space-y-8" method="POST">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Codename -->
+<div class="flex flex-col">
+<label class="font-label-bold text-label-bold uppercase mb-2 text-on-surface" for="codename">CODENAME (USERNAME)</label>
+<input class="input-form p-3 font-mono-style text-body-md" id="codename" name="codename" placeholder="e.g. SHADOW_HAWK_01" required="" type="text"/>
+<p class="font-mono-style text-mono-style text-on-surface-variant mt-2 text-[10px]">Alphanumeric designations only. No real names permitted.</p>
+</div>
+<!-- Operative Email -->
+<div class="flex flex-col">
+<label class="font-label-bold text-label-bold uppercase mb-2 text-on-surface" for="email">OPERATIVE EMAIL</label>
+<input class="input-form p-3 font-body-md text-body-md" id="email" name="email" placeholder="operative@ijp-secure.net" required="" type="email"/>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Clearance Code -->
+<div class="flex flex-col">
+<label class="font-label-bold text-label-bold uppercase mb-2 text-on-surface" for="password">CLEARANCE CODE (PASSWORD)</label>
+<input class="input-form p-3 font-mono-style text-body-md" id="password" name="password" placeholder="••••••••••••" required="" type="password"/>
+</div>
+<!-- Sector Selection -->
+<div class="flex flex-col">
+<label class="font-label-bold text-label-bold uppercase mb-2 text-on-surface" for="sector">SECTOR ALLOCATION (GRADE)</label>
+<div class="relative">
+<select class="input-form w-full p-3 font-body-md text-body-md appearance-none bg-transparent" id="sector" name="sector">
+<option disabled="" selected="" value="">AWAITING ASSIGNMENT...</option>
+<option value="g9">Sector 9 (Initiate)</option>
+<option value="g10">Sector 10 (Standard)</option>
+<option value="g11">Sector 11 (Advanced)</option>
+<option value="g12">Sector 12 (Vanguard)</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-on-surface">
+<span class="material-symbols-outlined" data-icon="arrow_drop_down">arrow_drop_down</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Biometric Mock -->
+<div class="border-2 border-on-surface p-6 bg-surface mt-8 relative overflow-hidden">
+<div class="absolute inset-0 opacity-10" style="background-image: repeating-linear-gradient(45deg, #1a1c1c 25%, transparent 25%, transparent 75%, #1a1c1c 75%, #1a1c1c), repeating-linear-gradient(45deg, #1a1c1c 25%, #f9f9f9 25%, #f9f9f9 75%, #1a1c1c 75%, #1a1c1c); background-position: 0 0, 10px 10px; background-size: 20px 20px;"></div>
+<div class="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-6">
+<div>
+<h3 class="font-label-bold text-label-bold uppercase text-on-surface mb-1">BIOMETRIC VERIFICATION</h3>
+<p class="font-mono-style text-mono-style text-on-surface-variant text-[11px]">Identity confirmation required for clearance protocol 7A.</p>
+</div>
+<button class="bg-on-surface text-surface-container-lowest font-label-bold text-label-bold uppercase px-6 py-3 border-2 border-on-surface bureaucratic-shadow-hover transition-all flex items-center gap-2 whitespace-nowrap" type="button">
+<span class="material-symbols-outlined" data-icon="fingerprint">fingerprint</span>
+                            INITIATE SCAN
+                        </button>
+</div>
+</div>
+<!-- Disclaimers -->
+<div class="space-y-4 pt-6 border-t-2 border-on-surface border-dashed">
+<div class="flex items-start gap-4">
+<input class="mt-1 cursor-pointer" id="terms" name="terms" required="" type="checkbox"/>
+<label class="font-mono-style text-mono-style text-on-surface-variant text-[11px] leading-tight cursor-pointer" for="terms">
+                            I acknowledge that by enlisting, I surrender my morning sleep cycles to the state. I agree to the <a class="text-primary underline decoration-2 hover:bg-primary hover:text-on-primary transition-colors" href="#">Propaganda Guidelines</a> and accept that dissent will be logged.
+                        </label>
+</div>
+</div>
+<!-- Actions -->
+<div class="pt-8 flex flex-col sm:flex-row gap-4 items-center justify-between">
+<p class="font-mono-style text-mono-style text-on-surface-variant text-[10px]">SERIAL: IJP-ENL-4928-XX</p>
+<button class="bg-primary text-on-primary font-headline-lg-mobile text-body-lg md:text-headline-lg-mobile uppercase px-12 py-4 border-2 border-on-surface bureaucratic-shadow bureaucratic-shadow-hover transition-all w-full sm:w-auto" type="submit">
+                        SUBMIT DOSSIER
+                    </button>
+</div>
+</form>
+<!-- Stamp Decoration -->
+<div class="absolute bottom-12 right-12 transform rotate-[-15deg] pointer-events-none opacity-80 mix-blend-multiply">
+<div class="border-4 border-error p-2 w-max">
+<span class="font-display-lg text-[32px] text-error uppercase tracking-widest leading-none block border-2 border-error p-1">UNVERIFIED</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Simple Footer for context -->
+<footer class="w-full mt-12 text-center py-6 relative z-10">
+<p class="font-mono-style text-mono-style text-on-surface-variant uppercase">© 1984 ISHAN JANTA PARTY. ALL TRUTHS RESERVED.</p>
+</footer>
+</body></html>

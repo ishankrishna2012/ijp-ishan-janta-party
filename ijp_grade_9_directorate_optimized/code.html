@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Grade 9 Student Hub &amp; Tracker - IJP</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Anton&amp;family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed": "#1b1b1b",
+                        "tertiary-fixed-dim": "#c6c6c6",
+                        "primary-container": "#ff9933",
+                        "primary-fixed": "#ffdcc2",
+                        "on-primary-container": "#693800",
+                        "secondary-fixed-dim": "#72de5c",
+                        "on-primary": "#ffffff",
+                        "tertiary": "#5e5e5e",
+                        "primary-fixed-dim": "#ffb77a",
+                        "on-error-container": "#93000a",
+                        "inverse-on-surface": "#f0f1f1",
+                        "error-container": "#ffdad6",
+                        "surface-dim": "#dadada",
+                        "inverse-primary": "#ffb77a",
+                        "on-secondary-container": "#067500",
+                        "on-error": "#ffffff",
+                        "tertiary-container": "#b2b2b2",
+                        "surface-variant": "#e2e2e2",
+                        "surface-container-low": "#f3f3f4",
+                        "surface": "#f9f9f9",
+                        "on-tertiary-fixed-variant": "#474747",
+                        "secondary": "#056e00",
+                        "outline-variant": "#dbc2b0",
+                        "surface-container-high": "#e8e8e8",
+                        "surface-bright": "#f9f9f9",
+                        "secondary-fixed": "#8dfc75",
+                        "background": "#f9f9f9",
+                        "on-background": "#1a1c1c",
+                        "on-primary-fixed-variant": "#6d3a00",
+                        "surface-tint": "#8f4e00",
+                        "surface-container": "#eeeeee",
+                        "error": "#ba1a1a",
+                        "secondary-container": "#8dfc75",
+                        "on-primary-fixed": "#2e1500",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed": "#012200",
+                        "surface-container-highest": "#e2e2e2",
+                        "primary": "#8f4e00",
+                        "on-secondary-fixed-variant": "#035300",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface": "#1a1c1c",
+                        "inverse-surface": "#2f3131",
+                        "tertiary-fixed": "#e2e2e2",
+                        "on-surface-variant": "#554336",
+                        "on-tertiary": "#ffffff",
+                        "outline": "#887364",
+                        "on-tertiary-container": "#444444"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "unit": "8px",
+                        "margin-desktop": "64px",
+                        "margin-mobile": "16px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "label-bold": ["Inter"],
+                        "headline-lg": ["Anton"],
+                        "mono-style": ["Inter"],
+                        "headline-lg-mobile": ["Anton"],
+                        "headline-xl": ["Anton"],
+                        "display-lg": ["Anton"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", {"lineHeight": "160%", "fontWeight": "400"}],
+                        "label-bold": ["14px", {"lineHeight": "120%", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "headline-lg": ["48px", {"lineHeight": "110%", "fontWeight": "400"}],
+                        "mono-style": ["12px", {"lineHeight": "120%", "letterSpacing": "0.1em", "fontWeight": "500"}],
+                        "headline-lg-mobile": ["36px", {"lineHeight": "110%", "fontWeight": "400"}],
+                        "headline-xl": ["64px", {"lineHeight": "110%", "fontWeight": "400"}],
+                        "display-lg": ["96px", {"lineHeight": "100%", "letterSpacing": "0.02em", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "150%", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-image: linear-gradient(0deg, transparent 24%, rgba(0, 0, 0, 0.05) 25%, rgba(0, 0, 0, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 0, 0, 0.05) 75%, rgba(0, 0, 0, 0.05) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(0, 0, 0, 0.05) 25%, rgba(0, 0, 0, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 0, 0, 0.05) 75%, rgba(0, 0, 0, 0.05) 76%, transparent 77%, transparent);
+            background-size: 50px 50px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-lg min-h-screen overflow-x-hidden selection:bg-primary selection:text-on-primary relative flex">
+<!-- SideNavBar (Web Only) -->
+<nav class="hidden md:flex bg-surface-container-highest dark:bg-surface-dim h-screen w-64 border-r-2 border-on-surface fixed left-0 top-0 flex-col p-4 z-40">
+<div class="mb-8 flex flex-col items-start gap-4">
+<div class="w-16 h-16 bg-on-surface border-2 border-on-surface flex items-center justify-center rounded-DEFAULT shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+<span class="material-symbols-outlined text-surface-container-lowest text-4xl" data-icon="shield">shield</span>
+</div>
+<div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface uppercase tracking-tighter leading-none">IJP</h1>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface uppercase tracking-tight leading-none mt-1">DIRECTORATE</h2>
+<p class="font-mono-style text-mono-style uppercase text-on-surface-variant mt-2 border-b-2 border-on-surface pb-1 inline-block">CLASS-A ACCESS</p>
+</div>
+</div>
+<ul class="flex flex-col gap-2 flex-grow">
+<!-- Active Tab -->
+<li>
+<a class="bg-secondary-container text-on-secondary-container border-2 border-on-surface shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center gap-3 px-4 py-3 font-label-bold text-label-bold uppercase translate-x-1 transition-transform duration-75" href="#">
+<span class="material-symbols-outlined" data-icon="school" style="font-variation-settings: 'FILL' 1;">school</span>
+                    Grade 9 Hub
+                </a>
+</li>
+<!-- Inactive Tabs -->
+<li>
+<a class="text-on-surface-variant hover:bg-surface-variant hover:text-on-surface flex items-center gap-3 px-4 py-3 font-label-bold text-label-bold uppercase border-2 border-transparent hover:bg-primary-container hover:text-on-primary-container transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+                    Homework Tracker
+                </a>
+</li>
+<li>
+<a class="text-on-surface-variant hover:bg-surface-variant hover:text-on-surface flex items-center gap-3 px-4 py-3 font-label-bold text-label-bold uppercase border-2 border-transparent hover:bg-primary-container hover:text-on-primary-container transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="campaign">campaign</span>
+                    Reporting Tools
+                </a>
+</li>
+</ul>
+<div class="mt-auto pt-8">
+<button class="w-full bg-primary text-on-primary font-label-bold text-label-bold uppercase py-3 px-4 border-2 border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all">
+                ENLIST NOW
+            </button>
+</div>
+</nav>
+<!-- TopAppBar (Mobile Only) -->
+<header class="md:hidden bg-background border-b-2 border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] fixed top-0 left-0 w-full z-40 flex justify-between items-center px-margin-mobile py-4">
+<div class="font-headline-lg-mobile text-headline-lg-mobile text-primary uppercase tracking-tighter leading-none">IJP</div>
+<button class="bg-primary text-on-primary border-2 border-on-surface shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] px-3 py-1 font-label-bold text-label-bold uppercase">MENU</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow md:ml-64 pt-24 md:pt-0 min-h-screen relative pb-32 md:pb-0">
+<div class="px-margin-mobile md:px-margin-desktop py-12 max-w-[container-max] mx-auto flex flex-col gap-gutter">
+<!-- Page Header -->
+<header class="mb-8 border-b-4 border-on-surface pb-6">
+<div class="inline-block bg-on-surface text-surface-container-lowest px-2 py-1 font-mono-style text-mono-style uppercase mb-4 shadow-[2px_2px_0px_0px_#ff9933]">
+<span class="material-symbols-outlined text-[14px] align-text-bottom mr-1" data-icon="lock" style="font-variation-settings: 'FILL' 1;">lock</span>
+                    CLASSIFIED: GRADE 9 EYES ONLY
+                </div>
+<h1 class="font-display-lg text-headline-xl md:text-display-lg text-on-surface uppercase tracking-tighter leading-none">OPERATION: NINTH GRADE</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-4 max-w-2xl">The central intelligence hub for all active 9th-grade operatives. Track munitions, monitor assessments, and access propaganda materials here.</p>
+</header>
+<!-- 3 Column Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter items-start">
+<!-- Homework Munitions (Tracker) -->
+<section class="space-y-6">
+<div class="bg-surface-container-lowest border-2 border-on-surface shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] relative p-6 mt-10">
+<!-- Dossier Tab -->
+<div class="absolute -top-10 left-[-2px] bg-surface-container-lowest border-2 border-on-surface border-b-0 px-4 py-2 font-label-bold text-label-bold uppercase flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="folder_special">folder_special</span>
+                        HOMEWORK MUNITIONS
+                    </div>
+<div class="absolute top-2 right-4 font-mono-style text-mono-style text-tertiary">SR-NO. 849-B</div>
+<div class="mt-4 space-y-6">
+<!-- Task 1 -->
+<div class="flex flex-col xl:flex-row xl:items-center gap-4 p-4 border-2 border-on-surface bg-surface hover:bg-surface-variant transition-colors group">
+<div class="flex-shrink-0 w-8 h-8 border-2 border-on-surface bg-surface-container-lowest flex items-center justify-center cursor-pointer group-hover:bg-primary-container transition-colors">
+<!-- Unchecked state -->
+</div>
+<div class="flex-grow">
+<h3 class="font-label-bold text-label-bold uppercase text-on-surface leading-tight">Math: Algebraic Aggression</h3>
+<p class="font-mono-style text-mono-style text-on-surface-variant mt-1">Due: 0800 HRS, TOMORROW</p>
+</div>
+<div class="flex-shrink-0">
+<span class="bg-error text-on-error font-mono-style text-[10px] sm:text-mono-style px-2 py-1 uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] border border-on-surface inline-block">CRITICAL PRIORITY</span>
+</div>
+</div>
+<!-- Task 2 -->
+<div class="flex flex-col xl:flex-row xl:items-center gap-4 p-4 border-2 border-on-surface bg-surface hover:bg-surface-variant transition-colors group">
+<div class="flex-shrink-0 w-8 h-8 border-2 border-on-surface bg-on-surface flex items-center justify-center cursor-pointer">
+<span class="material-symbols-outlined text-surface-container-lowest font-bold" data-icon="close">close</span>
+</div>
+<div class="flex-grow opacity-60 line-through">
+<h3 class="font-label-bold text-label-bold uppercase text-on-surface leading-tight">History: The Pre-IJP Dark Ages</h3>
+<p class="font-mono-style text-mono-style text-on-surface-variant mt-1">Due: COMPLETED</p>
+</div>
+<div class="flex-shrink-0 opacity-60">
+<span class="bg-secondary-container text-on-secondary-container font-mono-style text-[10px] sm:text-mono-style px-2 py-1 uppercase border border-on-surface inline-block">NEUTRALIZED</span>
+</div>
+</div>
+<!-- Progress Section -->
+<div class="pt-4 border-t-2 border-on-surface border-dashed">
+<div class="flex justify-between items-end mb-2">
+<span class="font-label-bold text-label-bold uppercase">Weekly Deployment Quota</span>
+<span class="font-mono-style text-mono-style">50%</span>
+</div>
+<div class="h-6 w-full bg-on-surface border-2 border-on-surface p-1 flex">
+<div class="h-full bg-secondary-fixed w-1/2 border-r-2 border-on-surface"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Exam Intelligence -->
+<section class="bg-surface-container-lowest border-2 border-on-surface p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] h-full">
+<div class="flex items-center gap-2 mb-6 border-b-2 border-on-surface pb-2">
+<span class="material-symbols-outlined text-error text-3xl" data-icon="warning" style="font-variation-settings: 'FILL' 1;">warning</span>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile uppercase text-on-surface leading-none">EXAM INTEL</h2>
+</div>
+<ul class="space-y-6">
+<li class="border-l-4 border-error pl-4">
+<div class="font-mono-style text-mono-style text-error mb-1">T-MINUS 48 HOURS</div>
+<h4 class="font-label-bold text-label-bold uppercase text-on-surface">Biology: Cellular Sabotage</h4>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm mt-1">Room 402. Bring #2 pencils and absolute loyalty.</p>
+</li>
+<li class="border-l-4 border-tertiary-fixed-dim pl-4">
+<div class="font-mono-style text-mono-style text-on-surface-variant mb-1">T-MINUS 7 DAYS</div>
+<h4 class="font-label-bold text-label-bold uppercase text-on-surface">English: Rhetorical Warfare</h4>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm mt-1">Essay submission. Propaganda techniques analyzed.</p>
+</li>
+</ul>
+</section>
+<!-- Poll of the Day -->
+<section class="bg-primary-container border-2 border-on-surface shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6 relative overflow-hidden h-full flex flex-col justify-between">
+<!-- Redaction bars for style -->
+<div class="absolute top-4 right-4 w-16 h-4 bg-on-surface"></div>
+<div class="absolute top-10 right-4 w-10 h-4 bg-on-surface"></div>
+<div>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-primary-container uppercase mb-2">THE VOX POPULI</h2>
+<p class="font-body-md text-body-md text-on-primary-fixed-variant mb-6 font-bold pr-16">Is the cafeteria serving "mystery meat" again, or is it a deliberate attempt to test our gastrointestinal fortitude?</p>
+</div>
+<form class="flex flex-col gap-3 mt-auto">
+<label class="flex items-center gap-3 p-3 border-2 border-on-surface bg-surface-container-lowest cursor-pointer hover:bg-primary transition-colors group">
+<input class="w-5 h-5 border-2 border-on-surface text-primary focus:ring-0 checked:bg-on-surface bg-transparent" name="poll" type="radio"/>
+<span class="font-label-bold text-label-bold uppercase group-hover:text-on-primary transition-colors leading-tight">Yes, it's a bio-weapon.</span>
+</label>
+<label class="flex items-center gap-3 p-3 border-2 border-on-surface bg-surface-container-lowest cursor-pointer hover:bg-primary transition-colors group">
+<input class="w-5 h-5 border-2 border-on-surface text-primary focus:ring-0 checked:bg-on-surface bg-transparent" name="poll" type="radio"/>
+<span class="font-label-bold text-label-bold uppercase group-hover:text-on-primary transition-colors leading-tight">No, it's premium protein.</span>
+</label>
+<button class="mt-4 bg-on-surface text-surface-container-lowest font-label-bold text-label-bold uppercase py-3 border-2 border-on-surface shadow-[4px_4px_0px_0px_#ffb77a] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all" type="button">SUBMIT RESPONSE</button>
+</form>
+</section>
+</div>
+<!-- Study Resources (Bento Grid Style) -->
+<section class="mt-8">
+<h2 class="font-headline-lg text-headline-lg uppercase mb-6 border-b-4 border-on-surface inline-block pb-1">APPROVED STUDY RESOURCES</h2>
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+<!-- Resource 1 -->
+<a class="bg-secondary text-on-secondary p-6 border-2 border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all flex flex-col justify-between aspect-square group" href="#">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-4xl" data-icon="book_5">book_5</span>
+<span class="font-mono-style text-mono-style border border-on-secondary px-1">PDF</span>
+</div>
+<div>
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile uppercase leading-none group-hover:underline">MATH FORMULAS v3.2</h3>
+<p class="font-mono-style text-mono-style mt-2 opacity-80">UPDATED: 09/24</p>
+</div>
+</a>
+<!-- Resource 2 -->
+<a class="bg-surface-container-lowest text-on-surface p-6 border-2 border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all flex flex-col justify-between aspect-square group md:col-span-2 relative overflow-hidden" href="#">
+<div class="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPgo8cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBmaWxsPSIjZmZmIiAvPgo8cGF0aCBkPSJNMCAwTDggOFpNOCAwTDAgOFoiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIxIiAvPgo8L3N2Zz4=')]"></div>
+<div class="relative z-10 flex justify-between items-start">
+<span class="material-symbols-outlined text-4xl text-primary" data-icon="smart_display">smart_display</span>
+<span class="bg-primary text-on-primary font-mono-style text-mono-style border-2 border-on-surface px-2 py-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">VIDEO DEBRIEF</span>
+</div>
+<div class="relative z-10">
+<h3 class="font-headline-lg text-headline-lg uppercase leading-none group-hover:text-primary transition-colors">HISTORY: WORLD WAR LECTURE SERIES</h3>
+<p class="font-mono-style text-mono-style mt-2 text-on-surface-variant">DURATION: 45:00</p>
+</div>
+</a>
+<!-- Resource 3 -->
+<a class="bg-surface-variant text-on-surface p-6 border-2 border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all flex flex-col justify-between aspect-square group" href="#">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-4xl" data-icon="quiz">quiz</span>
+<span class="font-mono-style text-mono-style border border-on-surface px-1">INTERACTIVE</span>
+</div>
+<div>
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile uppercase leading-none group-hover:underline">PRACTICE EXAMS</h3>
+<p class="font-mono-style text-mono-style mt-2 opacity-80">TEST YOUR LOYALTY</p>
+</div>
+</a>
+</div>
+</section>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-on-tertiary-fixed dark:bg-surface-container-lowest w-full border-t-2 border-on-surface py-8 px-margin-mobile md:px-margin-desktop grid grid-cols-1 md:grid-cols-2 gap-gutter md:ml-64 relative z-20">
+<div>
+<h2 class="font-headline-xl text-headline-xl text-primary leading-none mb-4">IJP</h2>
+<p class="font-mono-style text-mono-style uppercase text-tertiary-fixed-dim">© 1984 ISHAN JANTA PARTY. ALL TRUTHS RESERVED.</p>
+</div>
+<div class="flex flex-col md:items-end justify-center gap-2">
+<a class="text-tertiary-fixed-dim hover:text-primary font-mono-style text-mono-style uppercase hover:bg-primary hover:text-on-primary px-2 transition-all self-start md:self-end" href="#">LEGAL LIES</a>
+<a class="text-tertiary-fixed-dim hover:text-primary font-mono-style text-mono-style uppercase hover:bg-primary hover:text-on-primary px-2 transition-all self-start md:self-end" href="#">PRIVACY ILLUSION</a>
+<a class="text-primary underline font-mono-style text-mono-style uppercase hover:bg-primary hover:text-on-primary px-2 transition-all self-start md:self-end" href="#">STUDENT PORTAL</a>
+</div>
+</footer>
+</body></html>

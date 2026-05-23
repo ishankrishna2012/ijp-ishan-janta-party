@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>IJP - Ishan Janta Party</title>
+    
+    <!-- Tailwind CSS CDN with Forms & Container Queries plugins -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    
+    <!-- Google Fonts & Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+              "on-tertiary-fixed": "#1b1b1b",
+              "tertiary-fixed-dim": "#c6c6c6",
+              "primary-container": "#ff9933",
+              "primary-fixed": "#ffdcc2",
+              "on-primary-container": "#693800",
+              "secondary-fixed-dim": "#72de5c",
+              "on-primary": "#ffffff",
+              "tertiary": "#5e5e5e",
+              "primary-fixed-dim": "#ffb77a",
+              "on-error-container": "#93000a",
+              "inverse-on-surface": "#f0f1f1",
+              "error-container": "#ffdad6",
+              "surface-dim": "#dadada",
+              "inverse-primary": "#ffb77a",
+              "on-secondary-container": "#067500",
+              "on-error": "#ffffff",
+              "tertiary-container": "#b2b2b2",
+              "surface-variant": "#e2e2e2",
+              "surface-container-low": "#f3f3f4",
+              "surface": "#f9f9f9",
+              "on-tertiary-fixed-variant": "#474747",
+              "secondary": "#056e00",
+              "outline-variant": "#dbc2b0",
+              "surface-container-high": "#e8e8e8",
+              "surface-bright": "#f9f9f9",
+              "secondary-fixed": "#8dfc75",
+              "background": "#f9f9f9",
+              "on-background": "#1a1c1c",
+              "on-primary-fixed-variant": "#6d3a00",
+              "surface-tint": "#8f4e00",
+              "surface-container": "#eeeeee",
+              "error": "#ba1a1a",
+              "secondary-container": "#8dfc75",
+              "on-primary-fixed": "#2e1500",
+              "on-secondary": "#ffffff",
+              "on-secondary-fixed": "#012200",
+              "surface-container-highest": "#e2e2e2",
+              "primary": "#8f4e00",
+              "on-secondary-fixed-variant": "#035300",
+              "surface-container-lowest": "#ffffff",
+              "on-surface": "#1a1c1c",
+              "inverse-surface": "#2f3131",
+              "tertiary-fixed": "#e2e2e2",
+              "on-surface-variant": "#554336",
+              "on-tertiary": "#ffffff",
+              "outline": "#887364",
+              "on-tertiary-container": "#444444"
+            },
+            "borderRadius": {
+              "DEFAULT": "0.25rem",
+              "lg": "0.5rem",
+              "xl": "0.75rem",
+              "full": "9999px"
+            },
+            "spacing": {
+              "gutter": "24px",
+              "unit": "8px",
+              "margin-desktop": "64px",
+              "margin-mobile": "16px",
+              "container-max": "1280px"
+            },
+            "fontFamily": {
+              "body-lg": ["Inter"],
+              "label-bold": ["Inter"],
+              "headline-lg": ["Anton"],
+              "mono-style": ["Inter"],
+              "headline-lg-mobile": ["Anton"],
+              "headline-xl": ["Anton"],
+              "display-lg": ["Anton"],
+              "body-md": ["Inter"]
+            },
+            "fontSize": {
+              "body-lg": [
+                "18px",
+                {
+                  "lineHeight": "160%",
+                  "fontWeight": "400"
+                }
+              ],
+              "label-bold": [
+                "14px",
+                {
+                  "lineHeight": "120%",
+                  "letterSpacing": "0.05em",
+                  "fontWeight": "700"
+                }
+              ],
+              "headline-lg": [
+                "48px",
+                {
+                  "lineHeight": "110%",
+                  "fontWeight": "400"
+                }
+              ],
+              "mono-style": [
+                "12px",
+                {
+                  "lineHeight": "120%",
+                  "letterSpacing": "0.1em",
+                  "fontWeight": "500"
+                }
+              ],
+              "headline-lg-mobile": [
+                "36px",
+                {
+                  "lineHeight": "110%",
+                  "fontWeight": "400"
+                }
+              ],
+              "headline-xl": [
+                "64px",
+                {
+                  "lineHeight": "110%",
+                  "fontWeight": "400"
+                }
+              ],
+              "display-lg": [
+                "96px",
+                {
+                  "lineHeight": "100%",
+                  "letterSpacing": "0.02em",
+                  "fontWeight": "400"
+                }
+              ],
+              "body-md": [
+                "16px",
+                {
+                  "lineHeight": "150%",
+                  "fontWeight": "400"
+                }
+              ]
+            }
+          },
+        },
+      }
+    </script>
+  </head>
+  <body class="bg-background text-on-background relative min-h-screen overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container">
+    <!-- Global Textures -->
+    <div class="texture-noise"></div>
+    <div class="texture-scanline"></div>
+
+    <div id="root"></div>
+
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

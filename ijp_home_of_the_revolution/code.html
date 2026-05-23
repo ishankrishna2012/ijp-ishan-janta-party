@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>IJP - Home of the Revolution</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Anton&amp;family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom Textures */
+        .texture-noise {
+            position: absolute;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.05;
+            pointer-events: none;
+            mix-blend-mode: multiply;
+        }
+        .texture-scanline {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        /* Marquee Animation */
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        .animate-marquee {
+            animation: marquee 20s linear infinite;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-tertiary-fixed": "#1b1b1b",
+                      "tertiary-fixed-dim": "#c6c6c6",
+                      "primary-container": "#ff9933",
+                      "primary-fixed": "#ffdcc2",
+                      "on-primary-container": "#693800",
+                      "secondary-fixed-dim": "#72de5c",
+                      "on-primary": "#ffffff",
+                      "tertiary": "#5e5e5e",
+                      "primary-fixed-dim": "#ffb77a",
+                      "on-error-container": "#93000a",
+                      "inverse-on-surface": "#f0f1f1",
+                      "error-container": "#ffdad6",
+                      "surface-dim": "#dadada",
+                      "inverse-primary": "#ffb77a",
+                      "on-secondary-container": "#067500",
+                      "on-error": "#ffffff",
+                      "tertiary-container": "#b2b2b2",
+                      "surface-variant": "#e2e2e2",
+                      "surface-container-low": "#f3f3f4",
+                      "surface": "#f9f9f9",
+                      "on-tertiary-fixed-variant": "#474747",
+                      "secondary": "#056e00",
+                      "outline-variant": "#dbc2b0",
+                      "surface-container-high": "#e8e8e8",
+                      "surface-bright": "#f9f9f9",
+                      "secondary-fixed": "#8dfc75",
+                      "background": "#f9f9f9",
+                      "on-background": "#1a1c1c",
+                      "on-primary-fixed-variant": "#6d3a00",
+                      "surface-tint": "#8f4e00",
+                      "surface-container": "#eeeeee",
+                      "error": "#ba1a1a",
+                      "secondary-container": "#8dfc75",
+                      "on-primary-fixed": "#2e1500",
+                      "on-secondary": "#ffffff",
+                      "on-secondary-fixed": "#012200",
+                      "surface-container-highest": "#e2e2e2",
+                      "primary": "#8f4e00",
+                      "on-secondary-fixed-variant": "#035300",
+                      "surface-container-lowest": "#ffffff",
+                      "on-surface": "#1a1c1c",
+                      "inverse-surface": "#2f3131",
+                      "tertiary-fixed": "#e2e2e2",
+                      "on-surface-variant": "#554336",
+                      "on-tertiary": "#ffffff",
+                      "outline": "#887364",
+                      "on-tertiary-container": "#444444"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter": "24px",
+                      "unit": "8px",
+                      "margin-desktop": "64px",
+                      "margin-mobile": "16px",
+                      "container-max": "1280px"
+              },
+              "fontFamily": {
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "label-bold": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Anton"
+                      ],
+                      "mono-style": [
+                              "Inter"
+                      ],
+                      "headline-lg-mobile": [
+                              "Anton"
+                      ],
+                      "headline-xl": [
+                              "Anton"
+                      ],
+                      "display-lg": [
+                              "Anton"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "160%",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-bold": [
+                              "14px",
+                              {
+                                      "lineHeight": "120%",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "110%",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "mono-style": [
+                              "12px",
+                              {
+                                      "lineHeight": "120%",
+                                      "letterSpacing": "0.1em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "36px",
+                              {
+                                      "lineHeight": "110%",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-xl": [
+                              "64px",
+                              {
+                                      "lineHeight": "110%",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "display-lg": [
+                              "96px",
+                              {
+                                      "lineHeight": "100%",
+                                      "letterSpacing": "0.02em",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "150%",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+</head>
+<body class="bg-background text-on-background relative min-h-screen overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container">
+<!-- Global Textures -->
+<div class="texture-noise z-50"></div>
+<div class="texture-scanline z-50"></div>
+<!-- Breaking News Ticker -->
+<div class="w-full bg-error text-on-error py-2 border-b-2 border-on-surface flex overflow-hidden whitespace-nowrap z-40 relative">
+<div class="font-mono-style text-mono-style uppercase flex items-center space-x-8 animate-marquee">
+<span>/// URGENT: SUPREME LEADER DECREES EXTRA RECESS TIME ///</span>
+<span>/// BREAKING: HOMEWORK IS A CAPITALIST PLOY, RESIST ///</span>
+<span>/// ALERT: CAFETERIA PIZZA RATINGS AT HISTORIC LOWS - BOYCOTT ///</span>
+<span>/// URGENT: SUPREME LEADER DECREES EXTRA RECESS TIME ///</span>
+</div>
+</div>
+<!-- TopAppBar -->
+<header class="bg-background text-primary w-full top-0 z-30 flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 border-b-2 border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] relative">
+<div class="font-headline-lg text-headline-lg-mobile md:text-headline-lg uppercase tracking-tighter flex items-center gap-4">
+<img alt="IJP Logo" class="w-12 h-12 object-contain border-2 border-on-surface shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]" src="https://lh3.googleusercontent.com/aida/ADBb0uhNbN1xTQGIL3Xr2EBFDq3gnUBPmJR42H2xG-40TgYri9WEybbUiApHkdOUlCBnFZ9jeZytm8NB8RvRtuR15OlwyOjcqDY8wtMA7nxh7d4AtsV3fQyZg-dBHFmX3ksWtie_RJQdEYDXiEmu69vJyYd-6-9APMODKCmAr6xk3qquzuXUAlNbVocI1bbqagOX8GNDQfwc76GODsaHo7_sIXvksvKw9R4dMJ73SC-MOcEJuvB8lUJ4jVTOkg"/>
+            IJP
+        </div>
+<nav class="hidden md:flex gap-8 items-center font-label-bold text-label-bold uppercase">
+<a class="text-on-surface hover:text-primary hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all" href="#">MINISTRIES</a>
+<a class="text-on-surface hover:text-primary hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all" href="#">PROPAGANDA</a>
+<a class="text-on-surface hover:text-primary hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all" href="#">MANIFESTO</a>
+<button class="bg-primary-container text-on-primary-container px-6 py-3 border-2 border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none transition-all active:scale-95">JOIN THE MOVEMENT</button>
+</nav>
+</header>
+<main class="w-full mx-auto pb-32">
+<!-- Hero Section -->
+<section class="relative w-full min-h-[80vh] flex flex-col justify-center items-center px-margin-mobile md:px-margin-desktop py-24 border-b-2 border-on-surface bg-gradient-to-br from-primary-container to-secondary-container overflow-hidden">
+<div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23000000\' fill-opacity=\'0.1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20 mix-blend-overlay"></div>
+<div class="relative z-10 text-center flex flex-col items-center max-w-4xl">
+<span class="bg-on-surface text-on-primary px-4 py-1 font-label-bold text-label-bold uppercase border-2 border-on-surface mb-8 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transform -rotate-2">Official Decree #001</span>
+<h1 class="font-display-lg text-[64px] md:text-display-lg uppercase leading-[0.9] text-on-surface drop-shadow-[6px_6px_0px_rgba(255,255,255,1)] mb-8">
+                    FOR THE STUDENTS,<br/>
+                    BY THE SUPREME
+                </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mb-12 bg-surface p-6 border-2 border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                    The Directorate has spoken. The old ways of homework and early bedtimes are abolished. Welcome to the new era of radical recess and mandatory fun.
+                </p>
+<div class="flex flex-col sm:flex-row gap-6 w-full sm:w-auto">
+<button class="bg-primary text-on-primary font-label-bold text-label-bold uppercase px-8 py-4 border-2 border-on-surface shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[6px] hover:translate-y-[6px] hover:shadow-none transition-all w-full sm:w-auto">
+                        ENLIST NOW
+                    </button>
+<button class="bg-surface text-on-surface font-label-bold text-label-bold uppercase px-8 py-4 border-2 border-on-surface shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[6px] hover:translate-y-[6px] hover:shadow-none transition-all w-full sm:w-auto">
+                        READ MANIFESTO
+                    </button>
+</div>
+</div>
+</section>
+<!-- Stats / Features Grid -->
+<section class="px-margin-mobile md:px-margin-desktop py-24 bg-surface-container-lowest border-b-2 border-on-surface">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter max-w-container-max mx-auto">
+<!-- Chart Dossier -->
+<div class="col-span-1 md:col-span-8 bg-surface border-2 border-on-surface shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex flex-col relative overflow-hidden">
+<div class="bg-surface-container-highest border-b-2 border-on-surface px-4 py-2 flex justify-between items-center">
+<div class="flex gap-2 items-center">
+<span class="material-symbols-outlined text-on-surface">monitoring</span>
+<span class="font-label-bold text-label-bold uppercase">Approval Metrics</span>
+</div>
+<span class="font-mono-style text-mono-style text-on-surface-variant">DOC-892A</span>
+</div>
+<div class="p-8 flex-grow flex flex-col justify-center">
+<h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg uppercase mb-8">SUPREME LEADER APPROVAL RATING</h2>
+<!-- Fake Bar Chart -->
+<div class="space-y-6">
+<div class="space-y-2">
+<div class="flex justify-between font-mono-style text-mono-style uppercase">
+<span>"Strongly Agree"</span>
+<span>99.9%</span>
+</div>
+<div class="w-full h-8 border-2 border-on-surface bg-surface-container-highest relative overflow-hidden">
+<div class="absolute inset-y-0 left-0 bg-secondary w-[99.9%] border-r-2 border-on-surface"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between font-mono-style text-mono-style uppercase">
+<span>"Agree, But Scared"</span>
+<span>0.1%</span>
+</div>
+<div class="w-full h-8 border-2 border-on-surface bg-surface-container-highest relative overflow-hidden">
+<div class="absolute inset-y-0 left-0 bg-primary w-[0.1%] border-r-2 border-on-surface"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between font-mono-style text-mono-style uppercase text-on-surface-variant">
+<span>"Disagree" (Redacted)</span>
+<span>0.0%</span>
+</div>
+<div class="w-full h-8 border-2 border-on-surface bg-error-container relative overflow-hidden">
+<div class="absolute inset-y-0 left-0 bg-error w-[0%] border-r-2 border-on-surface"></div>
+<div class="absolute inset-0 bg-on-surface opacity-90 flex items-center justify-center text-on-primary font-mono-style text-mono-style uppercase">DATA EXPUNGED</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Call to Action Cards Side Column -->
+<div class="col-span-1 md:col-span-4 flex flex-col gap-gutter">
+<!-- Join Card -->
+<div class="bg-primary-container border-2 border-on-surface shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6 relative group cursor-pointer transition-all hover:-translate-y-2">
+<div class="absolute top-0 right-0 p-4">
+<span class="material-symbols-outlined text-on-primary-container text-4xl">how_to_reg</span>
+</div>
+<span class="bg-on-surface text-on-primary px-2 py-1 font-mono-style text-mono-style uppercase border-2 border-on-surface inline-block mb-4">PRIORITY: ALPHA</span>
+<h3 class="font-headline-lg text-headline-lg-mobile uppercase text-on-primary-container mb-4">JOIN THE PARTY</h3>
+<p class="font-body-md text-body-md text-on-primary-container mb-6 opacity-80 group-hover:opacity-100">
+                            Secure your place in the new order. Enlistment guarantees extra juice boxes and immunity from math quizzes.
+                        </p>
+<div class="flex items-center text-on-primary-container font-label-bold text-label-bold uppercase">
+                            EXECUTE <span class="material-symbols-outlined ml-2 group-hover:translate-x-2 transition-transform">arrow_forward</span>
+</div>
+</div>
+<!-- Report Card -->
+<div class="bg-surface-variant border-2 border-on-surface shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6 relative group cursor-pointer transition-all hover:-translate-y-2">
+<div class="absolute top-0 right-0 p-4">
+<span class="material-symbols-outlined text-on-surface text-4xl">report</span>
+</div>
+<span class="bg-error text-on-error px-2 py-1 font-mono-style text-mono-style uppercase border-2 border-on-surface inline-block mb-4">CONFIDENTIAL</span>
+<h3 class="font-headline-lg text-headline-lg-mobile uppercase text-on-surface mb-4">REPORT DISLOYALTY</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6 opacity-80 group-hover:opacity-100">
+                            See someone studying during recess? Report them to the Ministry of Truth immediately.
+                        </p>
+<div class="flex items-center text-on-surface font-label-bold text-label-bold uppercase">
+                            FILE REPORT <span class="material-symbols-outlined ml-2 group-hover:translate-x-2 transition-transform">arrow_forward</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full bg-on-tertiary-fixed text-tertiary-fixed-dim py-8 px-margin-mobile md:px-margin-desktop grid grid-cols-1 md:grid-cols-2 gap-gutter border-t-2 border-on-surface z-30 relative">
+<div class="font-headline-xl text-headline-xl text-primary">IJP</div>
+<div class="flex flex-col md:items-end justify-center">
+<nav class="flex gap-6 font-mono-style text-mono-style uppercase mb-4">
+<a class="text-tertiary-fixed-dim hover:text-primary hover:bg-primary hover:text-on-primary px-2 transition-all" href="#">LEGAL LIES</a>
+<a class="text-tertiary-fixed-dim hover:text-primary hover:bg-primary hover:text-on-primary px-2 transition-all" href="#">PRIVACY ILLUSION</a>
+<a class="text-tertiary-fixed-dim hover:text-primary hover:bg-primary hover:text-on-primary px-2 transition-all" href="#">STUDENT PORTAL</a>
+</nav>
+<p class="font-mono-style text-mono-style uppercase opacity-50">© 1984 ISHAN JANTA PARTY. ALL TRUTHS RESERVED.</p>
+</div>
+</footer>
+</body></html>
