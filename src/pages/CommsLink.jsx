@@ -15,15 +15,46 @@ export default function CommsLink() {
   const [isTyping, setIsTyping] = useState(false);
   const chatEndRef = useRef(null);
 
+  const [adminUsers, setAdminUsers] = useState([]);
+  const [selectedOperativeId, setSelectedOperativeId] = useState('');
+
+  // Auto-set admin mode
+  useEffect(() => {
+    if (user?.role === 'admin') {
+      setMode('admin');
+      const loadUsers = async () => {
+        const allUsers = await dbService.fetchUsers();
+        setAdminUsers(allUsers.filter(u => u.role !== 'admin'));
+      };
+      loadUsers();
+    }
+  }, [user]);
+
   // Load Admin Messages if mode is admin
   useEffect(() => {
     if (!user) return;
 
     if (mode === 'admin') {
       const fetchAdminMessages = async () => {
+        if (user.role === 'admin' && !selectedOperativeId) {
+          setMessages([]);
+          return;
+        }
+
         const data = await dbService.fetchChatMessages();
         if (data) {
-          const filtered = data.filter(d => d.sender_id === user.id || d.receiver_id === user.id);
+          const filtered = data.filter(d => {
+            if (user.role === 'admin') {
+              // Admin sees messages sent to/from the selected operative
+              return (d.sender_id === selectedOperativeId) || 
+                     (d.receiver_id === selectedOperativeId) ||
+                     (d.sender_id === selectedOperativeId && d.receiver_type === 'admin');
+            } else {
+              // Student sees their own messages
+              return d.sender_id === user.id || d.receiver_id === user.id;
+            }
+          });
+          
           setMessages(filtered.map(d => ({
             id: d.id,
             text: d.content,
@@ -61,7 +92,7 @@ export default function CommsLink() {
       // Chatbot mode initial message
       setMessages([{ id: 'init', text: 'Central Intelligence Online. State your query, Operative.', isBot: true, sender: 'chatbot' }]);
     }
-  }, [user, mode]);
+  }, [user, mode, selectedOperativeId]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -88,13 +119,17 @@ export default function CommsLink() {
       setMessages(prev => [...prev, { id: Date.now().toString(), text: botResponse, isBot: true, sender: 'chatbot' }]);
       setIsTyping(false);
     } else {
-      // Admin Mode: Save to Supabase
+      // Admin Mode: Save to db
       const tempId = Date.now().toString();
       setMessages(prev => [...prev, { id: tempId, text: userText, isBot: false, sender: 'user' }]);
       
+      const receiverType = user.role === 'admin' ? 'user' : 'admin';
+      const receiverId = user.role === 'admin' ? selectedOperativeId : null;
+
       await dbService.insertChatMessage({
         sender_id: user.id,
-        receiver_type: 'admin',
+        receiver_id: receiverId,
+        receiver_type: receiverType,
         content: userText,
       });
     }
@@ -180,23 +215,38 @@ export default function CommsLink() {
           <header className="mb-6 border-b-4 border-on-surface pb-6 shrink-0">
             <h1 className="font-display-lg text-headline-xl md:text-display-lg text-on-surface uppercase tracking-tighter leading-none mb-4">SECURE COMMS LINK</h1>
             
-            {/* Mode Switcher */}
-            <div className="flex gap-4 p-2 bg-surface-container-highest border-2 border-on-surface inline-flex shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-              <button 
-                onClick={() => setMode('chatbot')}
-                className={`px-4 py-2 font-label-bold uppercase text-sm border-2 ${mode === 'chatbot' ? 'bg-primary text-on-primary border-on-surface shadow-none translate-y-[2px] translate-x-[2px]' : 'bg-surface hover:bg-surface-variant border-transparent'} transition-all flex items-center gap-2`}
-              >
-                <span className="material-symbols-outlined text-[18px]">memory</span>
-                CENTRAL AI
-              </button>
-              <button 
-                onClick={() => setMode('admin')}
-                className={`px-4 py-2 font-label-bold uppercase text-sm border-2 ${mode === 'admin' ? 'bg-secondary text-on-secondary border-on-surface shadow-none translate-y-[2px] translate-x-[2px]' : 'bg-surface hover:bg-surface-variant border-transparent'} transition-all flex items-center gap-2`}
-              >
-                <span className="material-symbols-outlined text-[18px]">admin_panel_settings</span>
-                HUMAN ADMIN
-              </button>
-            </div>
+            {/* Mode Switcher / Admin Operative Selector */}
+            {user?.role === 'admin' ? (
+              <div className="flex gap-4 p-2 bg-surface-container-highest border-2 border-on-surface w-full max-w-sm">
+                <select 
+                  className="w-full bg-surface border-2 border-on-surface p-2 font-mono-style text-xs uppercase focus:outline-none focus:border-secondary"
+                  value={selectedOperativeId}
+                  onChange={e => setSelectedOperativeId(e.target.value)}
+                >
+                  <option value="">SELECT TARGET OPERATIVE...</option>
+                  {adminUsers.map(u => (
+                    <option key={u.id} value={u.id}>{u.codename} (Div {u.section || 'A'})</option>
+                  ))}
+                </select>
+              </div>
+            ) : (
+              <div className="flex gap-4 p-2 bg-surface-container-highest border-2 border-on-surface inline-flex shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                <button 
+                  onClick={() => setMode('chatbot')}
+                  className={`px-4 py-2 font-label-bold uppercase text-sm border-2 ${mode === 'chatbot' ? 'bg-primary text-on-primary border-on-surface shadow-none translate-y-[2px] translate-x-[2px]' : 'bg-surface hover:bg-surface-variant border-transparent'} transition-all flex items-center gap-2`}
+                >
+                  <span className="material-symbols-outlined text-[18px]">memory</span>
+                  CENTRAL AI
+                </button>
+                <button 
+                  onClick={() => setMode('admin')}
+                  className={`px-4 py-2 font-label-bold uppercase text-sm border-2 ${mode === 'admin' ? 'bg-secondary text-on-secondary border-on-surface shadow-none translate-y-[2px] translate-x-[2px]' : 'bg-surface hover:bg-surface-variant border-transparent'} transition-all flex items-center gap-2`}
+                >
+                  <span className="material-symbols-outlined text-[18px]">admin_panel_settings</span>
+                  HUMAN ADMIN
+                </button>
+              </div>
+            )}
           </header>
 
           {/* Chat Window */}
@@ -244,7 +294,7 @@ export default function CommsLink() {
               />
               <button 
                 type="submit"
-                disabled={!inputValue.trim()}
+                disabled={!inputValue.trim() || (user?.role === 'admin' && !selectedOperativeId)}
                 className="bg-primary text-on-primary border-2 border-on-surface px-6 font-label-bold uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
                 TRANSMIT

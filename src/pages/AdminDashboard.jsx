@@ -298,12 +298,6 @@ export default function AdminDashboard() {
             </Link>
           </li>
           <li className="mt-4 pt-4 border-t-2 border-on-surface border-dashed">
-            <Link className="flex items-center gap-3 px-4 py-3 font-label-bold text-label-bold uppercase text-on-surface hover:text-primary" to="/student-hub">
-              <span className="material-symbols-outlined">school</span>
-              Student Hub View
-            </Link>
-          </li>
-          <li>
             <Link className="flex items-center gap-3 px-4 py-3 font-label-bold text-label-bold uppercase text-on-surface hover:text-primary" to="/truth-directorate">
               <span className="material-symbols-outlined">campaign</span>
               Truth Directorate
@@ -612,16 +606,18 @@ export default function AdminDashboard() {
                           <td className="p-3 border-r-2 border-on-surface uppercase">{getSectionLabel(u.section)}</td>
                           <td className="p-3 border-r-2 border-on-surface">{u.d_no || '—'}</td>
                           <td className="p-3 border-r-2 border-on-surface text-center">
-                            <button
-                              onClick={() => handleToggleVerification(u.id, u.verified, u.codename)}
-                              className={`px-2 py-0.5 border border-on-surface text-[10px] font-bold uppercase transition-all btn-press ${
-                                u.verified 
-                                  ? 'bg-secondary text-on-secondary' 
-                                  : 'bg-error-container text-on-error-container'
-                              }`}
-                            >
-                              {u.verified ? '✓ VERIFIED' : '✗ UNVERIFIED'}
-                            </button>
+                            {u.verified ? (
+                              <span className="px-2 py-0.5 border border-on-surface text-[10px] font-bold uppercase bg-secondary text-on-secondary cursor-default inline-block">
+                                ✓ VERIFIED
+                              </span>
+                            ) : (
+                              <button
+                                onClick={() => handleToggleVerification(u.id, u.verified, u.codename)}
+                                className="px-2 py-0.5 border border-on-surface text-[10px] font-bold uppercase transition-all btn-press bg-error-container text-on-error-container"
+                              >
+                                ✗ UNVERIFIED
+                              </button>
+                            )}
                           </td>
                           <td className="p-3 border-r-2 border-on-surface uppercase font-bold text-center">
                             <span className={`px-2 py-0.5 border border-on-surface text-[10px] font-bold ${
@@ -677,7 +673,6 @@ export default function AdminDashboard() {
         <div className="flex flex-col md:items-end justify-center gap-2">
           <Link className="text-tertiary-fixed-dim hover:text-primary font-mono-style text-mono-style uppercase hover:bg-primary hover:text-on-primary px-2 transition-all self-start md:self-end" to="/truth-directorate">LEGAL LIES</Link>
           <Link className="text-tertiary-fixed-dim hover:text-primary font-mono-style text-mono-style uppercase hover:bg-primary hover:text-on-primary px-2 transition-all self-start md:self-end" to="/truth-directorate">PRIVACY ILLUSION</Link>
-          <Link className="text-primary underline font-mono-style text-mono-style uppercase hover:bg-primary hover:text-on-primary px-2 transition-all self-start md:self-end" to="/student-hub">STUDENT PORTAL</Link>
         </div>
       </footer>
     </div>

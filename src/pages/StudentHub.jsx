@@ -291,10 +291,10 @@ export default function StudentHub() {
                         className="flex flex-col xl:flex-row xl:items-center gap-4 p-4 border-2 border-on-surface bg-surface hover:bg-surface-variant transition-colors group cursor-pointer"
                       >
                         <div className={`flex-shrink-0 w-8 h-8 border-2 border-on-surface flex items-center justify-center transition-colors ${
-                          isComplete ? 'bg-on-surface' : 'bg-surface-container-lowest group-hover:bg-primary-container'
-                        }`}>
+                          isComplete ? 'bg-secondary text-on-secondary' : 'bg-surface-container-lowest group-hover:bg-primary-container'
+                        }`} title="Toggle Completion Status">
                           {isComplete && (
-                            <span className="material-symbols-outlined text-surface-container-lowest font-bold">close</span>
+                            <span className="material-symbols-outlined text-on-secondary font-bold">check</span>
                           )}
                         </div>
                         <div className={`flex-grow ${isComplete ? 'opacity-60 line-through' : ''}`}>
