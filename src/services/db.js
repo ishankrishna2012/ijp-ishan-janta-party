@@ -25,8 +25,32 @@ const trySupabase = async (supabasePromise) => {
   }
 };
 
+// Security: Client-Side Rate Limiter & Protections
+const RATE_LIMIT_MAX = 32767;
+const RATE_LIMIT_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
+
+const enforceRateLimit = () => {
+  try {
+    const now = Date.now();
+    let limitData = JSON.parse(localStorage.getItem('ijp_sec_limit') || '{"count":0,"windowStart":0}');
+    
+    if (now - limitData.windowStart > RATE_LIMIT_WINDOW_MS) {
+      limitData = { count: 1, windowStart: now };
+    } else {
+      limitData.count += 1;
+      if (limitData.count > RATE_LIMIT_MAX) {
+        throw new Error(`SECURITY DIRECTIVE 429: Rate limit exceeded (${RATE_LIMIT_MAX} req / 5min). System locked.`);
+      }
+    }
+    localStorage.setItem('ijp_sec_limit', JSON.stringify(limitData));
+  } catch (e) {
+    if (e.message.includes('SECURITY DIRECTIVE')) throw e;
+  }
+};
+
 export const dbService = {
   async signUp({ email, password, profileData }) {
+    enforceRateLimit();
     let uid = null;
     
     // 1. Try Supabase Auth
@@ -80,6 +104,7 @@ export const dbService = {
   },
 
   async signIn({ email, password }) {
+    enforceRateLimit();
     // 1. Try Supabase first
     const sbRes1 = await trySupabase(supabase.auth.signInWithPassword({ email, password }));
     if (sbRes1.source === 'supabase') return sbRes1.data;
