@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabaseClient';
+import { dbService } from '../services/db';
 import { getChatbotResponse } from '../utils/openai';
 
 export default function CommsLink() {
@@ -20,14 +21,10 @@ export default function CommsLink() {
 
     if (mode === 'admin') {
       const fetchAdminMessages = async () => {
-        const { data, error } = await supabase
-          .from('chat_messages')
-          .select('*')
-          .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
-          .order('created_at', { ascending: true });
-
-        if (!error && data) {
-          setMessages(data.map(d => ({
+        const data = await dbService.fetchChatMessages();
+        if (data) {
+          const filtered = data.filter(d => d.sender_id === user.id || d.receiver_id === user.id);
+          setMessages(filtered.map(d => ({
             id: d.id,
             text: d.content,
             isBot: d.is_bot_response,
@@ -95,15 +92,11 @@ export default function CommsLink() {
       const tempId = Date.now().toString();
       setMessages(prev => [...prev, { id: tempId, text: userText, isBot: false, sender: 'user' }]);
       
-      const { error } = await supabase.from('chat_messages').insert({
+      await dbService.insertChatMessage({
         sender_id: user.id,
         receiver_type: 'admin',
         content: userText,
       });
-
-      if (error) {
-        console.error("Error sending to admin:", error);
-      }
     }
   };
 

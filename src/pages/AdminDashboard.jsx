@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabaseClient';
+import { dbService } from '../services/db';
 
 export default function AdminDashboard() {
   const { user, signOutOperative } = useAuth();
@@ -45,28 +46,10 @@ export default function AdminDashboard() {
       setLoading(true);
       
       // 1. Fetch complaints and their profiles (joined)
-      const { data: complaintsData, error: complaintsError } = await supabase
-        .from('complaints')
-        .select(`
-          *,
-          profiles (
-            codename,
-            unique_id,
-            sector,
-            section
-          )
-        `)
-        .order('created_at', { ascending: false });
-
-      if (complaintsError) throw complaintsError;
+      const complaintsData = await dbService.fetchComplaints();
 
       // 2. Fetch users/profiles
-      const { data: usersData, error: usersError } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (usersError) throw usersError;
+      const usersData = await dbService.fetchUsers();
 
       setComplaints(complaintsData || []);
       setUsers(usersData || []);
@@ -129,15 +112,9 @@ export default function AdminDashboard() {
     setUpdateSuccess(false);
 
     try {
-      const { error } = await supabase
-        .from('complaints')
-        .update({
-          status: editStatus,
-          response: editResponse
-        })
-        .eq('id', selectedComplaint.id);
-
-      if (error) throw error;
+      await dbService.updateComplaintStatus(selectedComplaint.id, editStatus);
+      // Also update response in supabase directly (dbService doesn't handle response field yet)
+      await supabase.from('complaints').update({ response: editResponse }).eq('id', selectedComplaint.id);
 
       setUpdateSuccess(true);
       
@@ -167,12 +144,7 @@ export default function AdminDashboard() {
     if (!confirm) return;
 
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ verified: newStatus })
-        .eq('id', userId);
-
-      if (error) throw error;
+      await dbService.updateProfileStatus(userId, { verified: newStatus });
     } catch (err) {
       alert(`Verification update failed: ${err.message}`);
     }
@@ -184,12 +156,7 @@ export default function AdminDashboard() {
     if (!confirm) return;
 
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ role: 'admin' })
-        .eq('id', userId);
-
-      if (error) throw error;
+      await dbService.updateProfileStatus(userId, { role: 'admin' });
       alert(`Operative "${userCodename}" has been elevated to Admin status.`);
     } catch (err) {
       alert(`Promotion failed: ${err.message}`);

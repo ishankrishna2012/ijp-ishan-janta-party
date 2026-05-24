@@ -6,7 +6,9 @@ import {
   signOut as fbSignOut, 
   onAuthStateChanged 
 } from 'firebase/auth';
-import { doc, setDoc, getDoc, collection, getDocs, addDoc, query, where, orderBy } from 'firebase/firestore';
+import { 
+  doc, setDoc, getDoc, collection, getDocs, addDoc, query, where, orderBy, updateDoc 
+} from 'firebase/firestore';
 
 // Helper to determine if we should fallback
 const trySupabase = async (supabasePromise) => {
@@ -118,5 +120,76 @@ export const dbService = {
       return data;
     }
     return null;
+  },
+
+  async fetchUsers() {
+    const sbRes = await trySupabase(supabase.from('profiles').select('*').order('created_at', { ascending: false }));
+    if (sbRes.source === 'supabase') return sbRes.data || [];
+    const snap = await getDocs(query(collection(firebaseDb, 'profiles'), orderBy('created_at', 'desc')));
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  },
+
+  async updateProfileStatus(uid, updates) {
+    try { await supabase.from('profiles').update(updates).eq('id', uid); } catch(e) {}
+    try { await updateDoc(doc(firebaseDb, 'profiles', uid), updates); } catch(e) {}
+  },
+
+  async fetchMunitions(section) {
+    const sbRes = await trySupabase(
+      supabase.from('munitions').select('*').eq('section', section).order('created_at', { ascending: false })
+    );
+    if (sbRes.source === 'supabase') return sbRes.data || [];
+    
+    const snap = await getDocs(query(collection(firebaseDb, 'munitions'), where('section', '==', section), orderBy('created_at', 'desc')));
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  },
+
+  async insertMunition(data) {
+    const payload = { ...data, created_at: new Date().toISOString() };
+    let sbData = null;
+    try {
+      const res = await supabase.from('munitions').insert(payload).select().single();
+      if (!res.error) sbData = res.data;
+    } catch(e) {}
+    try { await addDoc(collection(firebaseDb, 'munitions'), payload); } catch(e) {}
+    return sbData || payload;
+  },
+
+  async fetchComplaints() {
+    const sbRes = await trySupabase(supabase.from('complaints').select('*').order('created_at', { ascending: false }));
+    if (sbRes.source === 'supabase') return sbRes.data || [];
+    
+    const snap = await getDocs(query(collection(firebaseDb, 'complaints'), orderBy('created_at', 'desc')));
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  },
+
+  async insertComplaint(data) {
+    const payload = { ...data, created_at: new Date().toISOString(), status: 'PENDING' };
+    try { await supabase.from('complaints').insert(payload); } catch(e) {}
+    try { await addDoc(collection(firebaseDb, 'complaints'), payload); } catch(e) {}
+  },
+
+  async updateComplaintStatus(id, status) {
+    try { await supabase.from('complaints').update({ status }).eq('id', id); } catch(e) {}
+    try { await updateDoc(doc(firebaseDb, 'complaints', id.toString()), { status }); } catch(e) {}
+  },
+
+  async fetchChatMessages() {
+    const sbRes = await trySupabase(supabase.from('chat_messages').select('*, profiles(codename)').order('created_at', { ascending: true }));
+    if (sbRes.source === 'supabase') return sbRes.data || [];
+    
+    const snap = await getDocs(query(collection(firebaseDb, 'chat_messages'), orderBy('created_at', 'asc')));
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  },
+
+  async insertChatMessage(data) {
+    const payload = { ...data, created_at: new Date().toISOString() };
+    let sbData = null;
+    try {
+      const res = await supabase.from('chat_messages').insert(payload).select('*, profiles(codename)').single();
+      if (!res.error) sbData = res.data;
+    } catch(e) {}
+    try { await addDoc(collection(firebaseDb, 'chat_messages'), payload); } catch(e) {}
+    return sbData || payload;
   }
 };

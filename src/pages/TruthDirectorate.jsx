@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabaseClient';
+import { dbService } from '../services/db';
 
 export default function TruthDirectorate() {
   const { user, signOutOperative } = useAuth();
@@ -24,12 +25,7 @@ export default function TruthDirectorate() {
     if (!user) return;
     try {
       setLoadingComplaints(true);
-      const { data, error } = await supabase
-        .from('complaints')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
+      const data = await dbService.fetchComplaints();
       setMyComplaints(data || []);
     } catch (err) {
       console.error('Error fetching complaints:', err.message);
@@ -69,18 +65,13 @@ export default function TruthDirectorate() {
     setSubmitSuccess(false);
 
     try {
-      const { error } = await supabase
-        .from('complaints')
-        .insert({
-          target_subject: targetSubject,
-          transgression_type: transgressionType,
-          details: details,
-          user_id: user.id,
-          user_unique_id: user.unique_id,
-          status: 'PENDING'
-        });
-
-      if (error) throw error;
+      await dbService.insertComplaint({
+        target_subject: targetSubject,
+        transgression_type: transgressionType,
+        details: details,
+        user_id: user.id,
+        user_unique_id: user.unique_id
+      });
 
       setSubmitSuccess(true);
       setTargetSubject('');

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabaseClient';
+import { dbService } from '../services/db';
 import { processMunition, generateRandomIntel } from '../utils/openai';
 
 export default function StudentHub() {
@@ -39,16 +40,7 @@ export default function StudentHub() {
     if (!user) return;
 
     const fetchMunitions = async () => {
-      let { data, error } = await supabase
-        .from('munitions')
-        .select('*')
-        .eq('section', user.section || 'A')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching munitions:', error);
-        return;
-      }
+      let data = await dbService.fetchMunitions(user.section || 'A');
 
       // Filter by type
       let hws = data.filter(d => d.type === 'HOMEWORK');
@@ -58,7 +50,7 @@ export default function StudentHub() {
       if (hws.length === 0) {
         const randomHw = await generateRandomIntel('HOMEWORK');
         if (randomHw) {
-          const { data: newHw } = await supabase.from('munitions').insert({
+          const newHw = await dbService.insertMunition({
             type: 'HOMEWORK',
             subject: randomHw.subject,
             content: randomHw.content,
@@ -66,7 +58,7 @@ export default function StudentHub() {
             due_date: randomHw.dueDate,
             section: user.section || 'A',
             user_id: user.id
-          }).select().single();
+          });
           if (newHw) hws = [newHw];
         }
       }
@@ -74,7 +66,7 @@ export default function StudentHub() {
       if (ints.length === 0) {
         const randomInt = await generateRandomIntel('EXAM_INTEL');
         if (randomInt) {
-          const { data: newInt } = await supabase.from('munitions').insert({
+          const newInt = await dbService.insertMunition({
             type: 'EXAM_INTEL',
             subject: randomInt.subject,
             content: randomInt.content,
@@ -82,7 +74,7 @@ export default function StudentHub() {
             due_date: randomInt.dueDate,
             section: user.section || 'A',
             user_id: user.id
-          }).select().single();
+          });
           if (newInt) ints = [newInt];
         }
       }
@@ -147,7 +139,7 @@ export default function StudentHub() {
       }
 
       // Insert new munition
-      const { error } = await supabase.from('munitions').insert({
+      await dbService.insertMunition({
         type: submitType,
         subject: subject,
         content: processed.formattedContent,
@@ -156,8 +148,6 @@ export default function StudentHub() {
         section: user.section || 'A',
         user_id: user.id
       });
-
-      if (error) throw error;
       
       setShowSubmitModal(false);
       setSubject('');
