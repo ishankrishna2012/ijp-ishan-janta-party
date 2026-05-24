@@ -1,21 +1,37 @@
 import OpenAI from "openai";
 
-// Warning: Using API keys in the browser is generally insecure. 
-// This is for demonstration / prototype purposes per user request.
 const openai = new OpenAI({
   apiKey: import.meta.env.VITE_OPENAI_API_KEY,
   dangerouslyAllowBrowser: true 
 });
 
-/**
- * Validates a new munition submission against existing ones to prevent duplicates.
- * Also formats it properly.
- * @param {string} type 'HOMEWORK' or 'EXAM_INTEL'
- * @param {string} subject 
- * @param {string} content 
- * @param {Array} existingItems 
- * @returns {Object} { isDuplicate: boolean, formattedContent: string, priority: string, dueDate: string }
- */
+const nvidia = new OpenAI({
+  apiKey: import.meta.env.VITE_NVIDIA_API_KEY,
+  baseURL: 'https://integrate.api.nvidia.com/v1',
+  dangerouslyAllowBrowser: true
+});
+
+const executeWithFallback = async (options) => {
+  try {
+    return await openai.chat.completions.create(options);
+  } catch (err) {
+    console.warn("OpenAI Failed, falling back to NVIDIA API:", err.message);
+    try {
+      // NVIDIA API might not support response_format json_object in all models, 
+      // but meta/llama3-70b-instruct is robust. We adjust model name for NVIDIA.
+      const fallbackOptions = { 
+        ...options, 
+        model: "meta/llama3-70b-instruct",
+        // remove response_format if it causes issues, but we can try it first.
+      };
+      return await nvidia.chat.completions.create(fallbackOptions);
+    } catch (nvErr) {
+      console.error("NVIDIA API also failed:", nvErr);
+      throw new Error("Central Intelligence and Backup Systems are currently offline.");
+    }
+  }
+};
+
 export const processMunition = async (type, subject, content, existingItems) => {
   const existingStr = existingItems.map(item => `- ${item.subject}: ${item.content}`).join('\n');
   
@@ -43,7 +59,7 @@ Return ONLY a JSON object exactly like this, nothing else:
 `;
 
   try {
-    const response = await openai.chat.completions.create({
+    const response = await executeWithFallback({
       model: "gpt-4o-mini",
       messages: [{ role: "user", content: prompt }],
       response_format: { type: "json_object" }
@@ -52,14 +68,10 @@ Return ONLY a JSON object exactly like this, nothing else:
     const result = JSON.parse(response.choices[0].message.content);
     return result;
   } catch (err) {
-    console.error("OpenAI Error:", err);
-    throw new Error("Central Intelligence is currently offline.");
+    throw err;
   }
 };
 
-/**
- * Generates a random 9th grade homework or exam intel item if none exist.
- */
 export const generateRandomIntel = async (type) => {
   const prompt = `
 You are the IJP Central Intelligence AI.
@@ -76,7 +88,7 @@ Return ONLY a JSON object exactly like this:
 `;
 
   try {
-    const response = await openai.chat.completions.create({
+    const response = await executeWithFallback({
       model: "gpt-4o-mini",
       messages: [{ role: "user", content: prompt }],
       response_format: { type: "json_object" }
@@ -84,14 +96,10 @@ Return ONLY a JSON object exactly like this:
 
     return JSON.parse(response.choices[0].message.content);
   } catch (err) {
-    console.error("OpenAI Error:", err);
     return null;
   }
 };
 
-/**
- * Handles chatbot messages.
- */
 export const getChatbotResponse = async (userMessage, chatHistory) => {
   const messages = [
     { 
@@ -103,14 +111,14 @@ export const getChatbotResponse = async (userMessage, chatHistory) => {
   ];
 
   try {
-    const response = await openai.chat.completions.create({
+    const response = await executeWithFallback({
       model: "gpt-4o-mini",
       messages: messages,
     });
 
     return response.choices[0].message.content;
   } catch (err) {
-    console.error("OpenAI Error:", err);
     return "ERROR: SATELLITE UPLINK FAILED. COMPLIANCE MANDATORY.";
   }
 };
+

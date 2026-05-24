@@ -1,10 +1,48 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
+import { supabase } from '../supabaseClient';
 
 export default function Profile() {
-  const { user, signOutOperative } = useAuth();
+  const { user, signOutOperative, refreshUser } = useAuth();
   const navigate = useNavigate();
+  const [uploading, setUploading] = useState(false);
+
+  const handleUploadId = async (e) => {
+    const file = e.target.files[0];
+    if (!file || !user?.id) return;
+    
+    setUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop().toLowerCase();
+      const filePath = `${user.id}/id-card.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('id-cards')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: true,
+        });
+
+      if (uploadError) throw uploadError;
+
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ id_card_url: filePath })
+        .eq('id', user.id);
+
+      if (updateError) throw updateError;
+      
+      // refresh context to update id_card_url locally immediately
+      await refreshUser();
+      alert("ID Card uploaded successfully! Awaiting Directorate verification.");
+    } catch (err) {
+      console.error("Upload failed", err);
+      alert("Upload failed: " + err.message);
+    } finally {
+      setUploading(false);
+    }
+  };
 
   return (
     <div className="bg-background text-on-background font-body-lg min-h-screen overflow-x-hidden selection:bg-primary selection:text-on-primary relative flex">
@@ -78,9 +116,19 @@ export default function Profile() {
                 <span className="material-symbols-outlined text-4xl text-error">warning</span>
                 <div>
                   <h3 className="font-headline-md text-headline-md text-on-error-container uppercase leading-none mb-2">VERIFICATION PENDING</h3>
-                  <p className="font-mono-style text-sm text-on-error-container opacity-90">
+                  <p className="font-mono-style text-sm text-on-error-container opacity-90 mb-4">
                     Your D-Number and ID Card upload are currently under review by the Directorate. Until verified, your access may be monitored, restricted, or completely revoked at any time. Compliance is mandatory.
                   </p>
+                  
+                  {!user?.id_card_url && (
+                    <div className="mt-4">
+                      <label className="bg-surface text-on-surface px-4 py-2 border-2 border-on-error-container cursor-pointer hover:bg-surface-variant transition-colors font-label-bold inline-block shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none">
+                        UPLOAD MISSING ID CARD
+                        <input type="file" className="hidden" accept="image/*,.pdf" onChange={handleUploadId} disabled={uploading} />
+                      </label>
+                      {uploading && <span className="ml-4 font-mono-style text-xs font-bold text-on-error-container animate-pulse">TRANSMITTING SECURE DATA...</span>}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

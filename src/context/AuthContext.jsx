@@ -15,6 +15,24 @@ export const AuthProvider = ({ children }) => {
   // Auth State Listener
   useEffect(() => {
     let mounted = true;
+    let profileSubscription = null;
+
+    const setupProfileSubscription = (uid) => {
+      if (profileSubscription) supabase.removeChannel(profileSubscription);
+      
+      profileSubscription = supabase.channel(`public:profiles:${uid}`)
+        .on('postgres_changes', { 
+          event: 'UPDATE', 
+          schema: 'public', 
+          table: 'profiles', 
+          filter: `id=eq.${uid}` 
+        }, (payload) => {
+          if (mounted) {
+            setUser(prev => prev ? { ...prev, ...payload.new } : prev);
+          }
+        })
+        .subscribe();
+    };
 
     const getInitialSession = async () => {
       try {
@@ -22,6 +40,7 @@ export const AuthProvider = ({ children }) => {
         if (sessionRes?.user && mounted) {
           const profile = await dbService.fetchProfile(sessionRes.user.id);
           setUser(profile ? { ...sessionRes.user, ...profile } : sessionRes.user);
+          setupProfileSubscription(sessionRes.user.id);
         }
       } catch (err) {
         console.error('Session fetching error:', err);
@@ -38,18 +57,21 @@ export const AuthProvider = ({ children }) => {
         if (mounted) {
           setUser(profile ? { ...session.user, ...profile } : session.user);
           setLoading(false);
+          setupProfileSubscription(session.user.id);
         }
       } else {
         if (mounted) {
           setUser(null);
           setLoading(false);
         }
+        if (profileSubscription) supabase.removeChannel(profileSubscription);
       }
     });
 
     return () => {
       mounted = false;
       subscription.unsubscribe();
+      if (profileSubscription) supabase.removeChannel(profileSubscription);
     };
   }, []);
 
