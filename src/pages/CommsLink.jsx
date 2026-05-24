@@ -59,7 +59,8 @@ export default function CommsLink() {
             id: d.id,
             text: d.content,
             isBot: d.is_bot_response,
-            sender: d.sender_id === user.id ? 'user' : 'admin'
+            sender: d.sender_id === user.id ? 'user' : 'other',
+            senderCodename: d.profiles?.codename || 'OPERATIVE'
           })));
         }
       };
@@ -258,7 +259,7 @@ export default function CommsLink() {
                 return (
                   <div key={msg.id} className={`flex flex-col ${isMine ? 'items-end' : 'items-start'}`}>
                     <div className="font-mono-style text-[10px] text-tertiary mb-1 uppercase">
-                      {isMine ? user.codename : (mode === 'chatbot' ? 'CENTRAL INTELLIGENCE' : 'DIRECTORATE ADMIN')}
+                      {isMine ? user.codename : (mode === 'chatbot' ? 'CENTRAL INTELLIGENCE' : (user?.role === 'admin' ? msg.senderCodename || 'OPERATIVE' : 'DIRECTORATE ADMIN'))}
                     </div>
                     <div className={`p-3 max-w-[80%] border-2 border-on-surface font-mono-style text-sm ${
                       isMine 
@@ -289,7 +290,7 @@ export default function CommsLink() {
                 type="text"
                 value={inputValue}
                 onChange={e => setInputValue(e.target.value)}
-                placeholder={mode === 'chatbot' ? "Query Central Intelligence..." : "Send secure transmission to Admin..."}
+                placeholder={mode === 'chatbot' ? "Query Central Intelligence..." : (user?.role === 'admin' ? "Send secure transmission to Operative..." : "Send secure transmission to Admin...")}
                 className="flex-grow bg-surface border-2 border-on-surface p-3 font-mono-style text-on-surface outline-none focus:border-secondary"
               />
               <button 
