@@ -7,6 +7,8 @@ import Manifesto from './pages/Manifesto';
 import TruthDirectorate from './pages/TruthDirectorate';
 import StudentHub from './pages/StudentHub';
 import AdminDashboard from './pages/AdminDashboard';
+import Profile from './pages/Profile';
+import CommsLink from './pages/CommsLink';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
 function App() {
@@ -36,6 +38,24 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={['student', 'admin']}>
               <TruthDirectorate />
+            </ProtectedRoute>
+          } 
+        />
+        
+        <Route 
+          path="/profile" 
+          element={
+            <ProtectedRoute allowedRoles={['student', 'admin']}>
+              <Profile />
+            </ProtectedRoute>
+          } 
+        />
+
+        <Route 
+          path="/comms-link" 
+          element={
+            <ProtectedRoute allowedRoles={['student', 'admin']}>
+              <CommsLink />
             </ProtectedRoute>
           } 
         />

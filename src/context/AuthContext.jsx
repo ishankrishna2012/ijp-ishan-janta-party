@@ -201,8 +201,22 @@ export const AuthProvider = ({ children }) => {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       setUser(null);
+      window.location.href = '/login';
     } catch (err) {
       console.error('Error signing out:', err.message);
+    }
+  };
+
+  // 4. Reset Password
+  const resetPasswordOperative = async (email) => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + '/login',
+      });
+      if (error) throw error;
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: err.message };
     }
   };
 
@@ -212,6 +226,7 @@ export const AuthProvider = ({ children }) => {
     signUpOperative,
     signInOperative,
     signOutOperative,
+    resetPasswordOperative,
     refreshUser: async () => {
       if (user?.id) {
         const profile = await fetchProfile(user.id);

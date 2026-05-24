@@ -325,6 +325,12 @@ export default function AdminDashboard() {
             </button>
           </li>
           <li className="mt-4 pt-4 border-t-2 border-on-surface border-dashed">
+            <Link className="flex items-center gap-3 px-4 py-3 font-label-bold text-label-bold uppercase text-on-surface hover:text-primary" to="/comms-link">
+              <span className="material-symbols-outlined">satellite_alt</span>
+              SECURE COMMS LINK
+            </Link>
+          </li>
+          <li className="mt-4 pt-4 border-t-2 border-on-surface border-dashed">
             <Link className="flex items-center gap-3 px-4 py-3 font-label-bold text-label-bold uppercase text-on-surface hover:text-primary" to="/student-hub">
               <span className="material-symbols-outlined">school</span>
               Student Hub View

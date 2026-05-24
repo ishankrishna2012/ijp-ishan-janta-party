@@ -10,7 +10,7 @@ create table if not exists public.profiles (
   email text not null,
   sector text not null default 'g9',
   section text not null default 'A' check (section in ('A','B','C','D','E','F','G','H','I','J')),
-  d_no text not null,
+  d_no text not null unique,
   unique_id text not null unique, -- IJP-2026-XXXXX (last 5 digits of D-Number)
   id_card_url text,
   verified boolean not null default false,
@@ -165,7 +165,72 @@ create policy "Admins can view all ID cards"
   );
 
 -- ============================================================
--- 6. Notes
+-- 6. Munitions Table (Homework & Exam Intel)
+-- ============================================================
+create table if not exists public.munitions (
+  id uuid default gen_random_uuid() primary key,
+  type text not null check (type in ('HOMEWORK', 'EXAM_INTEL')),
+  subject text not null,
+  content text not null,
+  due_date text, -- e.g. '0800 HRS, TOMORROW' or 'T-MINUS 48 HOURS'
+  priority text, -- e.g. 'CRITICAL PRIORITY'
+  section text not null,
+  user_id uuid references public.profiles(id) on delete cascade not null,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+alter table public.munitions enable row level security;
+alter publication supabase_realtime add table public.munitions;
+
+-- Allow students to read munitions for their section (and admins to read all)
+create policy "Users read own section munitions"
+  on public.munitions for select
+  using (
+    section = (select p.section from public.profiles p where p.id = auth.uid())
+    or 
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'admin')
+  );
+
+-- Anyone can insert
+create policy "Anyone can insert munitions"
+  on public.munitions for insert
+  with check (auth.uid() = user_id);
+
+-- ============================================================
+-- 7. Chat Messages Table
+-- ============================================================
+create table if not exists public.chat_messages (
+  id uuid default gen_random_uuid() primary key,
+  sender_id uuid references public.profiles(id) on delete set null,
+  receiver_type text not null check (receiver_type in ('admin', 'chatbot', 'student')),
+  receiver_id uuid references public.profiles(id) on delete set null,
+  content text not null,
+  is_bot_response boolean not null default false,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+alter table public.chat_messages enable row level security;
+alter publication supabase_realtime add table public.chat_messages;
+
+-- Allow users to read their own chat history, admins can read all
+create policy "Users can read own chat"
+  on public.chat_messages for select
+  using (
+    sender_id = auth.uid() 
+    or receiver_id = auth.uid()
+    or exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'admin')
+  );
+
+-- Anyone can insert chat
+create policy "Users can insert chat"
+  on public.chat_messages for insert
+  with check (
+    auth.uid() is not null 
+    -- Allow bot responses inserted by client to pass through (sender_id might be null for bot)
+  );
+
+-- ============================================================
+-- 8. Notes
 -- ============================================================
 -- After signup, manually set role='admin' for admin accounts:
 --   UPDATE public.profiles SET role = 'admin' WHERE email = 'your-admin@email.com';

@@ -3,13 +3,15 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
-  const { user, signInOperative } = useAuth();
+  const { user, signInOperative, resetPasswordOperative } = useAuth();
   const navigate = useNavigate();
 
   const [loginIdentifier, setLoginIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState(null);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const [showForgot, setShowForgot] = useState(false);
+  const [resetMsg, setResetMsg] = useState(null);
 
   // If already logged in, redirect appropriately
   useEffect(() => {
@@ -33,6 +35,24 @@ export default function Login() {
     } else {
       setAuthError(result.error);
       setIsAuthenticating(false);
+    }
+  };
+
+  const handleReset = async (e) => {
+    e.preventDefault();
+    if (!loginIdentifier || !loginIdentifier.includes('@')) {
+      setAuthError('Must provide a valid email address for password reset.');
+      return;
+    }
+    setIsAuthenticating(true);
+    setAuthError(null);
+    setResetMsg(null);
+    const result = await resetPasswordOperative(loginIdentifier);
+    setIsAuthenticating(false);
+    if (result.success) {
+      setResetMsg('Reset link deployed to secure inbox.');
+    } else {
+      setAuthError(result.error);
     }
   };
 
@@ -87,6 +107,17 @@ export default function Login() {
                 </div>
               )}
 
+              {/* Reset Success Box */}
+              {resetMsg && (
+                <div className="border-2 border-secondary bg-secondary-container p-4 bureaucratic-shadow relative">
+                  <div className="flex items-center gap-2 mb-1 text-on-secondary-container font-label-bold text-label-bold uppercase">
+                    <span className="material-symbols-outlined text-secondary">mark_email_read</span>
+                    DISPATCH CONFIRMED
+                  </div>
+                  <p className="font-mono-style text-xs text-on-secondary-container">{resetMsg}</p>
+                </div>
+              )}
+
               {/* Input: Operative ID */}
               <div className="space-y-2 relative">
                 <label className="block font-label-bold text-label-bold uppercase text-on-surface" htmlFor="operative_id">
@@ -109,40 +140,61 @@ export default function Login() {
               </div>
 
               {/* Input: Authorization Key */}
-              <div className="space-y-2 relative">
-                <label className="block font-label-bold text-label-bold uppercase text-on-surface" htmlFor="auth_key">
-                  Authorization Key (Password)
-                </label>
-                <div className="relative">
-                  <input 
-                    className="w-full bg-surface border-2 border-on-surface p-4 font-mono-style text-mono-style text-on-surface placeholder-tertiary-fixed-dim outline-none focus:border-secondary focus:ring-0 rounded-none transition-colors" 
-                    id="auth_key" 
-                    name="auth_key" 
-                    placeholder="••••••••••••" 
-                    required 
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    disabled={isAuthenticating}
-                  />
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-tertiary-fixed-dim">key</span>
+              {!showForgot && (
+                <div className="space-y-2 relative">
+                  <label className="block font-label-bold text-label-bold uppercase text-on-surface" htmlFor="auth_key">
+                    Authorization Key (Password)
+                  </label>
+                  <div className="relative">
+                    <input 
+                      className="w-full bg-surface border-2 border-on-surface p-4 font-mono-style text-mono-style text-on-surface placeholder-tertiary-fixed-dim outline-none focus:border-secondary focus:ring-0 rounded-none transition-colors" 
+                      id="auth_key" 
+                      name="auth_key" 
+                      placeholder="••••••••••••" 
+                      required 
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      disabled={isAuthenticating}
+                    />
+                    <span className="absolute right-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-tertiary-fixed-dim">key</span>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Action Area */}
               <div className="pt-6">
-                <button 
-                  className="w-full bg-primary text-on-primary border-2 border-on-surface py-5 px-6 font-label-bold text-label-bold uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all rounded-none flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed" 
-                  type="submit"
-                  disabled={isAuthenticating}
-                >
-                  {isAuthenticating ? 'AUTHENTICATING...' : 'Authenticate'}
-                  <span className="material-symbols-outlined">login</span>
-                </button>
+                {!showForgot ? (
+                  <button 
+                    className="w-full bg-primary text-on-primary border-2 border-on-surface py-5 px-6 font-label-bold text-label-bold uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all rounded-none flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed" 
+                    type="submit"
+                    disabled={isAuthenticating}
+                  >
+                    {isAuthenticating ? 'AUTHENTICATING...' : 'Authenticate'}
+                    <span className="material-symbols-outlined">login</span>
+                  </button>
+                ) : (
+                  <button 
+                    className="w-full bg-secondary text-on-secondary border-2 border-on-surface py-5 px-6 font-label-bold text-label-bold uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all rounded-none flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed" 
+                    type="button"
+                    onClick={handleReset}
+                    disabled={isAuthenticating}
+                  >
+                    {isAuthenticating ? 'TRANSMITTING...' : 'Deploy Reset Link'}
+                    <span className="material-symbols-outlined">lock_reset</span>
+                  </button>
+                )}
               </div>
 
               {/* Auxiliary Links */}
               <div className="text-center pt-4 flex flex-col gap-2">
+                <button 
+                  type="button"
+                  onClick={() => { setShowForgot(!showForgot); setAuthError(null); setResetMsg(null); }}
+                  className="inline-block font-mono-style text-mono-style text-on-surface-variant hover:text-primary uppercase border-b border-transparent hover:border-primary transition-colors"
+                >
+                  {showForgot ? 'RETURN TO UPLINK' : 'CLEARANCE CODE COMPROMISED? (FORGOT)'}
+                </button>
                 <Link 
                   to="/signup" 
                   className="inline-block font-mono-style text-mono-style text-on-surface-variant hover:text-secondary uppercase border-b border-transparent hover:border-secondary transition-colors"
