@@ -28,55 +28,73 @@ const trySupabase = async (supabasePromise) => {
 export const dbService = {
   async signUp({ email, password, profileData }) {
     let uid = null;
-    let authError = null;
     
     // 1. Try Supabase Auth
     try {
       const { data, error } = await supabase.auth.signUp({ 
         email, 
         password,
-        options: {
-          data: profileData // This triggers Supabase backend to insert the profile
-        }
+        options: { data: profileData }
       });
       if (error) throw error;
       uid = data.user.id;
     } catch (e) {
-      authError = e;
+      console.warn("Supabase SignUp attempt 1 failed:", e);
     }
 
-    // 2. Try Firebase Auth
+    // 2. Try Firebase Auth if Supabase failed
     let fbUid = null;
-    try {
-      const fbCred = await createUserWithEmailAndPassword(firebaseAuth, email, password);
-      fbUid = fbCred.user.uid;
-      // If Supabase failed, we'll use Firebase UID
-      if (!uid) uid = fbUid;
-    } catch (e) {
-      if (!uid) throw e; // Both failed
+    if (!uid) {
+      try {
+        const fbCred = await createUserWithEmailAndPassword(firebaseAuth, email, password);
+        fbUid = fbCred.user.uid;
+        uid = fbUid;
+      } catch (e) {
+        console.warn("Firebase SignUp failed:", e);
+        // 3. Try Supabase Auth AGAIN if Firebase failed
+        try {
+          const { data, error } = await supabase.auth.signUp({ 
+            email, 
+            password,
+            options: { data: profileData }
+          });
+          if (error) throw error;
+          uid = data.user.id;
+        } catch (retryError) {
+          console.error("Supabase SignUp attempt 2 failed:", retryError);
+          throw retryError; // Give the final Supabase error to the UI
+        }
+      }
     }
 
     const finalProfile = { ...profileData, id: uid };
 
-    // 3. Insert Profile to Firebase
+    // Insert Profile to Firebase
     try {
       await setDoc(doc(firebaseDb, 'profiles', uid), finalProfile);
     } catch (e) {
       console.error("Firebase profile insert failed", e);
     }
 
-    if (authError && !fbUid) throw authError;
     return { id: uid };
   },
 
   async signIn({ email, password }) {
-    // Try Supabase first
-    const sbRes = await trySupabase(supabase.auth.signInWithPassword({ email, password }));
-    if (sbRes.source === 'supabase') return sbRes.data;
+    // 1. Try Supabase first
+    const sbRes1 = await trySupabase(supabase.auth.signInWithPassword({ email, password }));
+    if (sbRes1.source === 'supabase') return sbRes1.data;
 
-    // Fallback to Firebase
-    const fbCred = await signInWithEmailAndPassword(firebaseAuth, email, password);
-    return { user: { id: fbCred.user.uid, email: fbCred.user.email } };
+    // 2. Fallback to Firebase
+    try {
+      const fbCred = await signInWithEmailAndPassword(firebaseAuth, email, password);
+      return { user: { id: fbCred.user.uid, email: fbCred.user.email } };
+    } catch (e) {
+      console.warn("Firebase SignIn failed:", e);
+      // 3. Try Supabase again
+      const sbRes2 = await trySupabase(supabase.auth.signInWithPassword({ email, password }));
+      if (sbRes2.source === 'supabase') return sbRes2.data;
+      throw sbRes2.error || e; // Throw the Supabase error (or fallback to firebase error)
+    }
   },
 
   async signOut() {
