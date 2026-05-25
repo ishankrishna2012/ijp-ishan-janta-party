@@ -12,8 +12,16 @@ import CommsLink from './pages/CommsLink';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
 function App() {
+  const missingEnvVars = !import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY;
+
   return (
-    <Router>
+    <>
+      {missingEnvVars && (
+        <div className="bg-error text-on-error p-4 text-center font-bold font-mono-style uppercase z-50 relative border-b-4 border-on-surface">
+          CRITICAL DEPLOYMENT ERROR: Missing Supabase Environment Variables in Netlify. Backend connectivity neutralized. Please add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.
+        </div>
+      )}
+      <Router>
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<Home />} />
@@ -74,6 +82,7 @@ function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
+    </>
   );
 }
 
