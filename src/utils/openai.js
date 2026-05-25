@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 
 const nvidia = new OpenAI({
-  apiKey: import.meta.env.VITE_NVIDIA_API_KEY,
+  apiKey: import.meta.env.VITE_NVIDIA_API_KEY || "placeholder",
   baseURL: 'https://integrate.api.nvidia.com/v1',
   dangerouslyAllowBrowser: true
 });
