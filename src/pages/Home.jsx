@@ -154,7 +154,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-12 gap-gutter max-w-container-max mx-auto">
             {/* Chart Dossier */}
             <div className="col-span-1 md:col-span-8 bg-surface border-2 border-on-surface shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex flex-col relative overflow-hidden">
-              <div class="bg-surface-container-highest border-b-2 border-on-surface px-4 py-2 flex justify-between items-center">
+              <div className="bg-surface-container-highest border-b-2 border-on-surface px-4 py-2 flex justify-between items-center">
                 <div className="flex gap-2 items-center">
                   <span className="material-symbols-outlined text-on-surface">monitoring</span>
                   <span className="font-label-bold text-label-bold uppercase">Approval Metrics</span>
