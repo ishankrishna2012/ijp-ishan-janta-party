@@ -1,34 +1,21 @@
 import OpenAI from "openai";
 
-const openai = new OpenAI({
-  apiKey: import.meta.env.VITE_OPENAI_API_KEY,
-  dangerouslyAllowBrowser: true 
-});
-
 const nvidia = new OpenAI({
   apiKey: import.meta.env.VITE_NVIDIA_API_KEY,
   baseURL: 'https://integrate.api.nvidia.com/v1',
   dangerouslyAllowBrowser: true
 });
 
-const executeWithFallback = async (options) => {
+const executeNvidia = async (options) => {
   try {
-    return await openai.chat.completions.create(options);
-  } catch (err) {
-    console.warn("OpenAI Failed, falling back to NVIDIA API:", err.message);
-    try {
-      // NVIDIA API might not support response_format json_object in all models, 
-      // but meta/llama3-70b-instruct is robust. We adjust model name for NVIDIA.
-      const fallbackOptions = { 
-        ...options, 
-        model: "meta/llama3-70b-instruct",
-        // remove response_format if it causes issues, but we can try it first.
-      };
-      return await nvidia.chat.completions.create(fallbackOptions);
-    } catch (nvErr) {
-      console.error("NVIDIA API also failed:", nvErr);
-      throw new Error("Central Intelligence and Backup Systems are currently offline.");
-    }
+    const nvidiaOptions = { 
+      ...options, 
+      model: "nvidia/nemotron-4-340b-instruct",
+    };
+    return await nvidia.chat.completions.create(nvidiaOptions);
+  } catch (nvErr) {
+    console.error("NVIDIA API failed:", nvErr);
+    throw new Error("Central Intelligence and Backup Systems are currently offline.");
   }
 };
 
@@ -59,13 +46,16 @@ Return ONLY a JSON object exactly like this, nothing else:
 `;
 
   try {
-    const response = await executeWithFallback({
-      model: "gpt-4o-mini",
+    const response = await executeNvidia({
       messages: [{ role: "user", content: prompt }],
-      response_format: { type: "json_object" }
+      // response_format: { type: "json_object" } // removed in case of lack of support
     });
 
-    const result = JSON.parse(response.choices[0].message.content);
+    let contentStr = response.choices[0].message.content;
+    if (contentStr.startsWith("```json")) {
+      contentStr = contentStr.replace(/^```json\n/, "").replace(/\n```$/, "");
+    }
+    const result = JSON.parse(contentStr);
     return result;
   } catch (err) {
     throw err;
@@ -88,13 +78,16 @@ Return ONLY a JSON object exactly like this:
 `;
 
   try {
-    const response = await executeWithFallback({
-      model: "gpt-4o-mini",
+    const response = await executeNvidia({
       messages: [{ role: "user", content: prompt }],
-      response_format: { type: "json_object" }
+      // response_format: { type: "json_object" }
     });
 
-    return JSON.parse(response.choices[0].message.content);
+    let contentStr = response.choices[0].message.content;
+    if (contentStr.startsWith("```json")) {
+      contentStr = contentStr.replace(/^```json\n/, "").replace(/\n```$/, "");
+    }
+    return JSON.parse(contentStr);
   } catch (err) {
     return null;
   }
@@ -111,8 +104,7 @@ export const getChatbotResponse = async (userMessage, chatHistory) => {
   ];
 
   try {
-    const response = await executeWithFallback({
-      model: "gpt-4o-mini",
+    const response = await executeNvidia({
       messages: messages,
     });
 
