@@ -559,7 +559,7 @@ export default function AdminDashboard() {
               </div>
 
             </section>
-          ) : (
+          ) : activeTab === 'OPERATIVES' ? (
             /* OPERATIVES (USERS) TAB */
             <section className="bg-surface-container-highest p-6 border-2 border-on-surface bureaucratic-shadow">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b-2 border-on-surface pb-4 mb-6">
