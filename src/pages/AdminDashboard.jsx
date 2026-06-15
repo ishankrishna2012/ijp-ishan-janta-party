@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabaseClient';
 import { dbService } from '../services/db';
+import { getChatbotResponse } from '../utils/openai';
 
 export default function AdminDashboard() {
   const { user, signOutOperative } = useAuth();
@@ -35,6 +36,12 @@ export default function AdminDashboard() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [updateError, setUpdateError] = useState(null);
   const [updateSuccess, setUpdateSuccess] = useState(false);
+
+  // AI Chatbot state
+  const [chatMessages, setChatMessages] = useState([{ id: 'init', text: 'Supreme Intelligence Online. Awaiting directive, Commander.', isBot: true }]);
+  const [chatInput, setChatInput] = useState('');
+  const [isChatTyping, setIsChatTyping] = useState(false);
+  const chatEndRef = useRef(null);
 
   // ID Card viewer
   const [viewingIdCard, setViewingIdCard] = useState(null);
@@ -289,6 +296,19 @@ export default function AdminDashboard() {
             >
               <span className="material-symbols-outlined">groups</span>
               Cadre Operatives
+            </button>
+          </li>
+          <li>
+            <button 
+              onClick={() => setActiveTab('AI_INTEL')}
+              className={`w-full flex items-center gap-3 px-4 py-3 font-label-bold text-label-bold uppercase border-2 transition-all ${
+                activeTab === 'AI_INTEL' 
+                  ? 'bg-secondary-container text-on-secondary-container border-on-surface shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] translate-x-1' 
+                  : 'text-on-surface-variant hover:bg-surface-variant hover:text-on-surface border-transparent'
+              }`}
+            >
+              <span className="material-symbols-outlined">smart_toy</span>
+              AI Intelligence
             </button>
           </li>
           <li className="mt-4 pt-4 border-t-2 border-on-surface border-dashed">
@@ -659,7 +679,83 @@ export default function AdminDashboard() {
                 </div>
               )}
             </section>
-          )}
+          ) : activeTab === 'AI_INTEL' ? (
+            /* AI CHATBOT TAB */
+            <section className="bg-surface-container-highest border-2 border-on-surface bureaucratic-shadow flex flex-col" style={{ minHeight: '600px' }}>
+              <div className="p-4 border-b-2 border-on-surface bg-surface flex items-center justify-between">
+                <h2 className="font-headline-lg-mobile uppercase text-on-surface flex items-center gap-2">
+                  <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>smart_toy</span>
+                  SUPREME INTELLIGENCE AI
+                </h2>
+                <span className="font-mono-style text-[10px] text-primary uppercase bg-primary-container px-2 py-1 border border-on-surface">LEVEL 9 CLEARANCE</span>
+              </div>
+
+              {/* Messages Area */}
+              <div className="flex-grow overflow-y-auto p-6 space-y-4" style={{ maxHeight: '450px' }}>
+                {chatMessages.map((msg) => (
+                  <div key={msg.id} className={`flex flex-col ${msg.isBot ? 'items-start' : 'items-end'}`}>
+                    <div className="font-mono-style text-[10px] text-tertiary mb-1 uppercase">
+                      {msg.isBot ? 'SUPREME INTELLIGENCE' : user?.codename}
+                    </div>
+                    <div className={`p-3 max-w-[80%] border-2 border-on-surface font-mono-style text-sm ${
+                      msg.isBot 
+                        ? 'bg-surface-container-highest text-on-surface rounded-r-lg rounded-bl-lg shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' 
+                        : 'bg-primary text-on-primary rounded-l-lg rounded-br-lg'
+                    }`}>
+                      {msg.text}
+                    </div>
+                  </div>
+                ))}
+                {isChatTyping && (
+                  <div className="flex flex-col items-start">
+                    <div className="font-mono-style text-[10px] text-tertiary mb-1 uppercase">SUPREME INTELLIGENCE</div>
+                    <div className="p-3 border-2 border-on-surface bg-surface-container-highest text-on-surface rounded-r-lg rounded-bl-lg shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex gap-1">
+                      <span className="w-2 h-2 bg-on-surface animate-ping rounded-full"></span>
+                      <span className="w-2 h-2 bg-on-surface animate-ping rounded-full" style={{ animationDelay: '75ms' }}></span>
+                      <span className="w-2 h-2 bg-on-surface animate-ping rounded-full" style={{ animationDelay: '150ms' }}></span>
+                    </div>
+                  </div>
+                )}
+                <div ref={chatEndRef} />
+              </div>
+
+              {/* Input Form */}
+              <form onSubmit={async (e) => {
+                e.preventDefault();
+                if (!chatInput.trim()) return;
+                const userText = chatInput.trim();
+                setChatInput('');
+                const newMessages = [...chatMessages, { id: Date.now().toString(), text: userText, isBot: false }];
+                setChatMessages(newMessages);
+                setIsChatTyping(true);
+                chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+                const history = newMessages.filter(m => m.id !== 'init').map(m => ({
+                  role: m.isBot ? 'assistant' : 'user',
+                  content: m.text
+                }));
+                const adminPrompt = "You are the IJP Supreme Intelligence AI. You serve the Supreme Leader of the Ishan Janta Party. Your tone is cold, bureaucratic, authoritative, and mildly dystopian. The user is an admin with Level 9 clearance. Provide strategic intelligence, analytics insights, and operational guidance. Ensure total compliance.";
+                const botResponse = await getChatbotResponse(userText, history, adminPrompt);
+                setChatMessages(prev => [...prev, { id: (Date.now() + 1).toString(), text: botResponse, isBot: true }]);
+                setIsChatTyping(false);
+                setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
+              }} className="p-4 bg-surface-container border-t-4 border-on-surface flex gap-4 shrink-0 mt-auto">
+                <input 
+                  type="text"
+                  value={chatInput}
+                  onChange={e => setChatInput(e.target.value)}
+                  placeholder="Issue directive to Supreme Intelligence..."
+                  className="flex-grow bg-surface border-2 border-on-surface p-3 font-mono-style text-on-surface outline-none focus:border-secondary uppercase"
+                />
+                <button 
+                  type="submit"
+                  disabled={!chatInput.trim()}
+                  className="bg-primary text-on-primary border-2 border-on-surface px-6 font-label-bold uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                >
+                  TRANSMIT
+                </button>
+              </form>
+            </section>
+          ) : null}
 
         </div>
       </main>
